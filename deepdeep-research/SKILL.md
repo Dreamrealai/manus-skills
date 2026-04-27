@@ -28,7 +28,7 @@ This skill is intentionally redundant. The redundancy is the feature. Do not "op
 10. **NEVER produce a final PDF without bookmarks and a clickable table of contents.**
 11. **ALWAYS save a tracker log** (`tracker.md`) updated at every check-in with timestamps.
 12. **ALWAYS flag conflicting findings** between sources explicitly in the synthesis.
-12a. **ALWAYS resolve conflicts via live web search before synthesis.** When research streams disagree on factual claims (version numbers, release dates, licensing, pricing, feature availability, API status), the agent MUST perform live web search (using search tools or browser navigation to the authoritative source — e.g., GitHub releases page, npm registry, official docs) to determine the ground truth as of today's date. Do NOT let Opus 4.7 or any LLM arbitrate factual disputes from memory alone. The web-verified answer is the canonical answer. Document every verification in `synthesis/conflict_resolution_log.md` with: the conflicting claims, which streams made them, the verification URL visited, the verified answer, and the date checked.
+12a. **ALWAYS resolve conflicts via live web search before synthesis — anchored to today's date.** When research streams disagree on factual claims (version numbers, release dates, licensing, pricing, feature availability, API status), the agent MUST perform live web search (using search tools or browser navigation to the authoritative source — e.g., GitHub releases page, npm registry, official docs) to determine the ground truth **as of today's date** (use `date +%Y-%m-%d` to get the current date and include it in every verification entry). Do NOT let Opus 4.7 or any LLM arbitrate factual disputes from memory alone — LLMs hallucinate version numbers constantly. The web-verified answer is the canonical answer. Document every verification in `synthesis/conflict_resolution_log.md` with: the conflicting claims, which streams made them, the verification URL visited, the verified answer, and the date checked. This rule applies to Opus 4.7's own claims as well — if Opus 4.7 asserts a version number during synthesis that was not web-verified, the agent MUST pause and verify it before including it in the final report.
 13. **ALWAYS attribute claims** to their originating stream (Gemini / ChatGPT / Claude / Manus-Social).
 14. **ALWAYS revisit and harvest streams that finish late.** If a stream finishes while you are working on other tasks, you MUST return to it, harvest the final output, and run the explicit `close` command on the tracker to clear the delivery gate. Do not silently move on.
 15. **ALWAYS enforce the Recency Protocol (April 2026).** Every quantitative claim MUST carry a `[Source, Month YYYY]` inline citation. Flag any data point older than October 2025 as STALE and explicitly caveat it. Prioritize Q1 2026 earnings calls and recent data.
@@ -372,7 +372,7 @@ Do NOT remove unique findings, citations, or any content from a single-source se
 
 ## Phase 4b — Conflict Resolution via Live Web Search (MANDATORY)
 
-**Goal:** Before Opus 4.7 synthesizes, the agent MUST identify and resolve every factual conflict between research streams using live web search. This prevents LLM hallucination from contaminating the final report.
+**Goal:** Before Opus 4.7 synthesizes, the agent MUST identify and resolve every factual conflict between research streams using live web search. This prevents LLM hallucination from contaminating the final report. **All verifications must be anchored to today's date** — run `date +%Y-%m-%d` at the start of this phase and include the date in every log entry. Opus 4.7 is the synthesizer, but it is NOT the fact-checker — the web is the fact-checker.
 
 **Procedure:**
 1. Compare all harvested raw reports and identify every factual disagreement: version numbers, release dates, licensing terms, pricing, feature claims, API availability, GitHub stars, maintenance status.
@@ -395,8 +395,9 @@ Do NOT remove unique findings, citations, or any content from a single-source se
 ```
 
 4. Feed the `conflict_resolution_log.md` to Opus 4.7 along with the raw reports so it uses verified facts, not LLM guesses.
+5. **Post-synthesis spot-check**: After Opus 4.7 produces the aggregated report, the agent MUST scan the output for any NEW factual claims (version numbers, dates, pricing) that Opus introduced which were NOT in the conflict resolution log. If found, web-verify those too before finalizing. Opus 4.7 is brilliant at synthesis but still hallucinates specifics.
 
-**Hard rule:** The agent MUST NOT proceed to Phase 5 aggregation until all identified conflicts have been web-verified. If a conflict cannot be verified (source is down, paywalled, etc.), document it as `UNVERIFIED` with the reason and flag it in the final report.
+**Hard rule:** The agent MUST NOT proceed to Phase 5 aggregation until all identified conflicts have been web-verified. If a conflict cannot be verified (source is down, paywalled, etc.), document it as `UNVERIFIED` with the reason and flag it in the final report. Every entry in the conflict resolution log MUST include the verification date (today's date via `date +%Y-%m-%d`).
 
 ## Phase 5 — Aggregation via Opus 4.7
 
