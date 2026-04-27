@@ -1,7 +1,7 @@
 ---
 name: brandinsights
 description: >-
-  A robust, agentic insights orchestrator for CPG, B2B, or any brand/industry/product launch. Mines consumer insights, brand history, competitive benchmarks, and social trends using 10+ deep research calls, 5 Opus 4.7 planning calls, 5 Gemini 3.1 Pro breadth calls, 3 ChatGPT 5.4 Thinking deduplication calls, and 2 ChatGPT 5.4 Pro Extended Thinking validation calls. Enforces MANDATORY 1-hour ChatGPT Deep Research wait loop, internal consistency checks before deck generation, and dual audits (Opus formatting + ChatGPT fact-check) after deck generation. Produces four deliverables: raw research markdown, de-duplicated insights markdown, Excel source sheet with hallucination risk column, and a 20-30 page PowerPoint deck.
+  A robust, agentic insights orchestrator for CPG, B2B, or any brand/industry/product launch. Mines consumer insights, brand history, competitive benchmarks, and social trends using 10+ deep research calls, 5 Opus 4.7 planning calls, 5 Gemini 3.1 Pro breadth calls, 3 GPT-5.5 Thinking deduplication calls (alias: gpt-5.5-high), and 2 GPT-5.5 Pro Extended Thinking validation calls (alias: gpt-5.5-pro, reasoning=xhigh). Enforces MANDATORY 1-hour ChatGPT Deep Research wait loop, internal consistency checks before deck generation, and dual audits (Opus formatting + ChatGPT fact-check) after deck generation. Produces four deliverables: raw research markdown, de-duplicated insights markdown, Excel source sheet with hallucination risk column, and a 20-30 page PowerPoint deck.
 ---
 
 # Brand Insights
@@ -19,8 +19,8 @@ You MUST execute at least:
 - **10 Deep Research Calls** (split across Gemini, ChatGPT, and Claude)
 - **5 Opus 4.7 Calls** (brand identity, competitor mapping, prompt generation)
 - **5 Gemini 3.1 Pro Calls** (social platform summarization)
-- **3 ChatGPT 5.4 Thinking Calls** (deduplication)
-- **2 ChatGPT 5.4 Pro Extended Thinking Calls** (validation and deck outlining)
+- **3 GPT-5.5 Thinking Calls** (deduplication) — alias: `gpt-5.5-high`, reasoning=high
+- **2 GPT-5.5 Pro Extended Thinking Calls** (validation and deck outlining) — alias: `gpt-5.5-pro`, reasoning=xhigh
 
 ### 2. ChatGPT Deep Research is MANDATORY
 ChatGPT Deep Research via browser extension is **required, not optional**. You MUST:
@@ -40,7 +40,7 @@ Every quantitative claim MUST carry a `(Source, Month YYYY)` inline citation. Fl
 This skill is designed for up to **2 hours**. ChatGPT Deep Research can take an hour. Let it run while completing social mining. Do not prematurely collapse research streams.
 
 ### 6. Deduplication is Mandatory
-The 10+ deep research calls produce massive overlapping data. You MUST use the 3 ChatGPT 5.4 Thinking calls to de-duplicate before producing `insights.md`.
+The 10+ deep research calls produce massive overlapping data. You MUST use the 3 GPT-5.5 Thinking calls (`gpt-5.5-high`, reasoning=high) to de-duplicate before producing `insights.md`.
 
 ### 7. Raw Research Section Required
 Every research file MUST include a `## Raw Research` section with:
@@ -57,7 +57,7 @@ Before generating the PowerPoint deck, you MUST run an internal consistency chec
 ### 10. Dual Audit After Deck Generation
 After deck is generated, you MUST run:
 - **Opus 4.7 PDF Formatting Audit** (per slide-production skill)
-- **ChatGPT 5.5 Thinking Fact-Check Audit** (per slide-production skill)
+- **GPT-5.5 Pro Fact-Check Audit** (alias: `gpt-5.5-pro`, reasoning=xhigh, per slide-production skill)
 - Fix all MAJOR_ISSUES, BLANK_BROKEN, LIKELY_HALLUCINATED, and CONTRADICTED items
 
 ### 11. Four Deliverables Required
@@ -245,11 +245,11 @@ Every 5 minutes, check ChatGPT thread status. Log each check:
 If not complete at 60 minutes: set 1-hour timer, continue other work, but DO NOT finalize deliverables.
 
 ### Phase 2: Deduplication and Synthesis (75-100 minutes)
-**Model calls:** 3 ChatGPT 5.4 Thinking, 2 Opus 4.7
+**Model calls:** 3 GPT-5.5 Thinking (`gpt-5.5-high`), 2 Opus 4.7
 
 1. Harvest all research streams (ChatGPT MUST be harvested)
 2. Compile raw research into `research.md` with `## Raw Research` sections
-3. Use 3 ChatGPT 5.4 Thinking calls to deduplicate:
+3. Use 3 GPT-5.5 Thinking calls (`gpt-5.5-high`, reasoning=high) to deduplicate:
    - Call 1: Dedupe market data and sizing
    - Call 2: Dedupe competitive intelligence
    - Call 3: Dedupe consumer insights and trends
@@ -259,9 +259,9 @@ If not complete at 60 minutes: set 1-hour timer, continue other work, but DO NOT
 7. Produce `sources.xlsx` with Hallucination Risk column
 
 ### Phase 3: Deck Generation and Validation (100-120 minutes)
-**Model calls:** 2 ChatGPT 5.4 Pro Extended Thinking, 1 Opus 4.7
+**Model calls:** 2 GPT-5.5 Pro (`gpt-5.5-pro`, reasoning=xhigh), 1 Opus 4.7
 
-1. Use ChatGPT 5.4 Pro Extended Thinking to outline deck structure
+1. Use GPT-5.5 Pro (`gpt-5.5-pro`, reasoning=xhigh) to outline deck structure
 2. Reference "Locked Values" table for all metrics
 3. Generate 20-30 slide deck in Manus native slides canvas
 4. Apply brand colors and visual identity

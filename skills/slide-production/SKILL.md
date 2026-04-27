@@ -156,8 +156,16 @@ Output a JSON array of all slide audits, then a summary table.
 **Trigger:** After Opus audit fixes are complete and PDF is re-exported.
 
 **Method:**
-1. Use OpenRouter to call ChatGPT 5.5 Thinking (or ChatGPT-4o with extended thinking)
-2. Provide the PDF URL or upload
+1. Use OpenRouter to call **`gpt-5.5-pro`** with `xhigh` reasoning (canonical alias for fact-checking audits):
+   ```bash
+   python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
+     --alias gpt-5.5-pro \
+     --reasoning xhigh \
+     --prompt-file /path/to/factcheck_prompt.txt \
+     --output /path/to/chatgpt_factcheck_audit_results.md
+   ```
+   **Fallback if gpt-5.5-pro fails:** Use `gpt-5.5-xhigh` (same model, same reasoning level).
+2. Provide the PDF URL or upload (embed the PDF text content in the prompt if direct URL fails)
 3. Use this prompt structure:
 
 ```
@@ -339,6 +347,35 @@ See full prompt in Audit 2 section above. Save as reference: `chatgpt_factcheck_
 
 ---
 
+## Manus Skill Update Procedure
+
+When updating this skill or any other skill globally, follow this two-step process:
+
+### Step 1: Update files on disk and push to GitHub
+```bash
+# 1. Edit the skill file(s)
+# 2. Copy to the cloned manus-skills repo
+cp /home/ubuntu/skills/<skill-name>/SKILL.md /home/ubuntu/manus-skills/skills/<skill-name>/SKILL.md
+# 3. Commit and push
+cd /home/ubuntu/manus-skills && git add -A && git commit -m "Update <skill-name>" && git push
+```
+
+### Step 2: Reload in Manus Settings via Browser (MANDATORY)
+After pushing to GitHub, the skill must be manually reloaded in Manus settings to take effect globally:
+1. Navigate to `https://manus.im/app#settings/skills` in the browser
+2. Find the skill to update in the list
+3. Click the **"..."** (three-dot) menu next to the skill name
+4. Click **"Delete"** to remove the old version
+5. Click **"+ Add Skill"** button
+6. Select **"Import from GitHub"** and enter the repository URL
+7. Select the updated skill and confirm import
+8. Verify the skill appears in the list with the updated description
+
+**If the "..." menu does not appear:** Hover over the skill card; the menu appears on hover.
+**If delete is not available:** The skill may be a built-in skill; only custom/imported skills can be deleted and re-imported.
+
+---
+
 ## Error Recovery
 
 ### If Opus audit fails to run:
@@ -347,9 +384,11 @@ See full prompt in Audit 2 section above. Save as reference: `chatgpt_factcheck_
 3. Document that automated audit was unavailable
 
 ### If ChatGPT audit fails to run:
-1. Retry via OpenRouter
-2. If still failing, manually review all quantitative claims for citations
-3. Flag deck as "Fact-check audit incomplete" in delivery
+1. Retry with `gpt-5.5-pro` alias and `--reasoning xhigh` flag
+2. If `gpt-5.5-pro` fails, fallback to `gpt-5.5-xhigh` alias
+3. If all OpenRouter calls fail, use Gemini 3.1 Pro as emergency fallback
+4. If still failing, manually review all quantitative claims for citations
+5. Flag deck as "Fact-check audit incomplete" in delivery
 
 ### If fix cycle creates new issues:
 1. Re-run relevant audit after fixes

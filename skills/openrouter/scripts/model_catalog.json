@@ -1,0 +1,475 @@
+{
+  "defaults": {
+    "chatgpt": "gpt-5.5",
+    "chatgpt-pro": "gpt-5.5-pro",
+    "chatgpt-high": "gpt-5.5-high",
+    "chatgpt-xhigh": "gpt-5.5-xhigh",
+    "chatgpt-legacy": "gpt-5.4-pro"
+  },
+  "models": {
+    "opus-4.7": {
+      "provider": "openrouter",
+      "api_model": "anthropic/claude-opus-4.7",
+      "task_types": [
+        "chat",
+        "analysis",
+        "writing",
+        "coding"
+      ],
+      "priority": 102,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Default Anthropic flagship and default general-purpose OpenRouter alias."
+    },
+    "opus-4.6": {
+      "provider": "openrouter",
+      "api_model": "anthropic/claude-opus-4.6",
+      "task_types": [
+        "chat",
+        "analysis",
+        "writing",
+        "coding"
+      ],
+      "priority": 100,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Previous Anthropic flagship kept for explicit user requests and fallback comparisons."
+    },
+    "opus-4.6-fast": {
+      "provider": "openrouter",
+      "api_model": "anthropic/claude-opus-4.6-fast",
+      "task_types": [
+        "chat",
+        "analysis"
+      ],
+      "priority": 92,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Faster Opus variant."
+    },
+    "sonnet-4.6": {
+      "provider": "openrouter",
+      "api_model": "anthropic/claude-sonnet-4.6",
+      "task_types": [
+        "chat",
+        "analysis",
+        "coding"
+      ],
+      "priority": 95,
+      "reasoning": "low",
+      "refresh_required": false,
+      "notes": "Fast professional default."
+    },
+    "gpt-5.4-pro": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.4-pro",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning",
+        "coding"
+      ],
+      "priority": 101,
+      "reasoning": "high",
+      "refresh_required": false,
+      "notes": "Newest highest-end reasoning helper for tasks that explicitly need maximum reasoning depth."
+    },
+    "gpt-5.4": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.4",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning"
+      ],
+      "priority": 99,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "General GPT 5.4 helper."
+    },
+    "gpt-5.4-mini": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.4-mini",
+      "task_types": [
+        "chat",
+        "analysis",
+        "batch"
+      ],
+      "priority": 75,
+      "reasoning": "low",
+      "refresh_required": false,
+      "notes": "Smaller GPT 5.4 helper."
+    },
+    "gpt-5.4-nano": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.4-nano",
+      "task_types": [
+        "chat",
+        "analysis",
+        "batch"
+      ],
+      "priority": 60,
+      "reasoning": "low",
+      "refresh_required": false,
+      "notes": "Fastest GPT 5.4 family helper."
+    },
+    "kimi-k2.5": {
+      "provider": "openrouter",
+      "api_model": "moonshotai/kimi-k2.5",
+      "task_types": [
+        "chat",
+        "analysis",
+        "coding"
+      ],
+      "priority": 88,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Current verified Kimi helper on OpenRouter."
+    },
+    "kimi-k2.6": {
+      "provider": "openrouter",
+      "api_model": "moonshotai/kimi-k2.5",
+      "task_types": [
+        "chat",
+        "analysis",
+        "coding"
+      ],
+      "priority": 89,
+      "reasoning": "medium",
+      "refresh_required": true,
+      "notes": "User-requested alias. Refresh before switching to a newer Kimi target."
+    },
+    "glm-5.1": {
+      "provider": "openrouter",
+      "api_model": "z-ai/glm-5.1",
+      "task_types": [
+        "chat",
+        "analysis",
+        "agentic"
+      ],
+      "priority": 90,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Verified GLM 5.1 alias from the current OpenRouter catalog."
+    },
+    "grok-4.20": {
+      "provider": "openrouter",
+      "api_model": "x-ai/grok-4.20",
+      "task_types": [
+        "chat",
+        "analysis",
+        "creative"
+      ],
+      "priority": 91,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Verified Grok flagship alias from the current OpenRouter catalog."
+    },
+    "grok-4.2": {
+      "provider": "openrouter",
+      "api_model": "x-ai/grok-4.20",
+      "task_types": [
+        "chat",
+        "analysis",
+        "creative"
+      ],
+      "priority": 91,
+      "reasoning": "medium",
+      "refresh_required": true,
+      "notes": "User-requested Grok alias. Refresh before changing the target if a distinct 4.2 entry appears."
+    },
+    "mystery-latest": {
+      "provider": "openrouter",
+      "api_model": "openrouter/elephant-alpha",
+      "task_types": [
+        "chat",
+        "analysis",
+        "experimental"
+      ],
+      "priority": 94,
+      "reasoning": "medium",
+      "refresh_required": true,
+      "notes": "Reserved for the newest notable model surfaced during refresh."
+    },
+    "deepseek-v3.2": {
+      "provider": "openrouter",
+      "api_model": "deepseek/deepseek-v3.2",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning",
+        "coding"
+      ],
+      "priority": 87,
+      "reasoning": "high",
+      "refresh_required": false,
+      "notes": "Strong value reasoning model."
+    },
+    "minimax-m2.7": {
+      "provider": "openrouter",
+      "api_model": "minimax/minimax-m2.7",
+      "task_types": [
+        "chat",
+        "analysis",
+        "writing"
+      ],
+      "priority": 84,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Verified MiniMax alias."
+    },
+    "qwen3.6-plus": {
+      "provider": "openrouter",
+      "api_model": "qwen/qwen3.6-plus",
+      "task_types": [
+        "chat",
+        "analysis",
+        "coding"
+      ],
+      "priority": 86,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Verified Qwen 3.6 Plus alias."
+    },
+    "qwen3-max": {
+      "provider": "openrouter",
+      "api_model": "qwen/qwen3-max",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning"
+      ],
+      "priority": 85,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Additional state-of-the-art Qwen helper."
+    },
+    "gemini-3.1-pro-preview": {
+      "provider": "gemini_first",
+      "api_model": "google/gemini-3.1-pro-preview",
+      "gemini_api_model": "gemini-3.1-pro-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "fallback"
+      ],
+      "priority": 93,
+      "reasoning": "high",
+      "refresh_required": false,
+      "notes": "Prefer direct Gemini API before OpenRouter transport."
+    },
+    "gemini-3.0-flash-preview": {
+      "provider": "gemini_first",
+      "api_model": "google/gemini-3-flash-preview",
+      "gemini_api_model": "gemini-3-flash-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "fallback"
+      ],
+      "priority": 82,
+      "reasoning": "medium",
+      "refresh_required": false,
+      "notes": "Fast Gemini fallback helper aligned to the Gemini skill alias naming."
+    },
+    "gemini-3.1-flash-lite": {
+      "provider": "gemini_first",
+      "api_model": "google/gemini-3.1-flash-lite-preview",
+      "gemini_api_model": "gemini-3.1-flash-lite-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "fallback",
+        "batch"
+      ],
+      "priority": 78,
+      "reasoning": "low",
+      "refresh_required": false,
+      "notes": "Low-cost Gemini fallback helper."
+    },
+    "gemini-3.1-flash-live": {
+      "provider": "gemini_first",
+      "api_model": "google/gemini-3.1-flash-live",
+      "gemini_api_model": "gemini-3.1-flash-live",
+      "task_types": [
+        "chat",
+        "analysis",
+        "fallback",
+        "live"
+      ],
+      "priority": 79,
+      "reasoning": "medium",
+      "refresh_required": true,
+      "notes": "Live Gemini fallback helper. Refresh if the deployment name changes."
+    },
+    "gemma-4": {
+      "provider": "gemini_first",
+      "api_model": "google/gemma-4",
+      "gemini_api_model": "gemma-4",
+      "task_types": [
+        "chat",
+        "analysis",
+        "fallback"
+      ],
+      "priority": 72,
+      "reasoning": "low",
+      "refresh_required": true,
+      "notes": "Gemma fallback helper. Refresh before first production use."
+    },
+    "gpt-5.5": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.5",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning",
+        "coding"
+      ],
+      "priority": 95,
+      "reasoning": "high",
+      "refresh_required": false,
+      "notes": "GPT-5.5 standard. Released Apr 24 2026. $5/M input, $30/M output. Use reasoning=high for complex tasks."
+    },
+    "gpt-5.5-pro": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.5-pro",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning",
+        "fact-check",
+        "audit"
+      ],
+      "priority": 97,
+      "reasoning": "xhigh",
+      "refresh_required": false,
+      "notes": "GPT-5.5 Pro. Released Apr 24 2026. $30/M input, $180/M output. Best for fact-checking, audits, complex reasoning. Use reasoning=xhigh."
+    },
+    "gpt-5.5-high": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.5",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning"
+      ],
+      "priority": 94,
+      "reasoning": "high",
+      "refresh_required": false,
+      "notes": "GPT-5.5 with high reasoning effort. Alias for gpt-5.5 + reasoning=high."
+    },
+    "gpt-5.5-xhigh": {
+      "provider": "openrouter",
+      "api_model": "openai/gpt-5.5",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning"
+      ],
+      "priority": 96,
+      "reasoning": "xhigh",
+      "refresh_required": false,
+      "notes": "GPT-5.5 with xhigh (extra-high) reasoning effort. ~95% of max_tokens used for reasoning."
+    }
+  },
+  "last_refreshed_utc": "2026-04-17T13:06:30.045977Z",
+  "last_refresh_report": {
+    "refreshed_at_utc": "2026-04-17T13:06:30.045977Z",
+    "verified": {
+      "opus-4.7": {
+        "target": "anthropic/claude-opus-4.7",
+        "present": true
+      },
+      "opus-4.6": {
+        "target": "anthropic/claude-opus-4.6",
+        "present": true
+      },
+      "opus-4.6-fast": {
+        "target": "anthropic/claude-opus-4.6-fast",
+        "present": true
+      },
+      "sonnet-4.6": {
+        "target": "anthropic/claude-sonnet-4.6",
+        "present": true
+      },
+      "gpt-5.4-pro": {
+        "target": "openai/gpt-5.4-pro",
+        "present": true
+      },
+      "gpt-5.4": {
+        "target": "openai/gpt-5.4",
+        "present": true
+      },
+      "gpt-5.4-mini": {
+        "target": "openai/gpt-5.4-mini",
+        "present": true
+      },
+      "gpt-5.4-nano": {
+        "target": "openai/gpt-5.4-nano",
+        "present": true
+      },
+      "kimi-k2.5": {
+        "target": "moonshotai/kimi-k2.5",
+        "present": true
+      },
+      "kimi-k2.6": {
+        "target": "moonshotai/kimi-k2.5",
+        "present": true
+      },
+      "glm-5.1": {
+        "target": "z-ai/glm-5.1",
+        "present": true
+      },
+      "grok-4.20": {
+        "target": "x-ai/grok-4.20",
+        "present": true
+      },
+      "grok-4.2": {
+        "target": "x-ai/grok-4.20",
+        "present": true
+      },
+      "deepseek-v3.2": {
+        "target": "deepseek/deepseek-v3.2",
+        "present": true
+      },
+      "minimax-m2.7": {
+        "target": "minimax/minimax-m2.7",
+        "present": true
+      },
+      "qwen3.6-plus": {
+        "target": "qwen/qwen3.6-plus",
+        "present": true
+      },
+      "qwen3-max": {
+        "target": "qwen/qwen3-max",
+        "present": true
+      },
+      "gemini-3.1-pro-preview": {
+        "target": "google/gemini-3.1-pro-preview",
+        "present": true
+      },
+      "gemini-3.0-flash-preview": {
+        "target": "google/gemini-3-flash-preview",
+        "present": true
+      },
+      "gemini-3.1-flash-lite": {
+        "target": "google/gemini-3.1-flash-lite-preview",
+        "present": true
+      },
+      "gemini-3.1-flash-live": {
+        "target": "google/gemini-3.1-flash-live",
+        "present": false
+      },
+      "gemma-4": {
+        "target": "google/gemma-4",
+        "present": false
+      }
+    },
+    "missing": [
+      "gemini-3.1-flash-live",
+      "gemma-4"
+    ],
+    "mystery_candidate": "openrouter/elephant-alpha",
+    "wrappers": []
+  }
+}
