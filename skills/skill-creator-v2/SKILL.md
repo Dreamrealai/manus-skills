@@ -108,7 +108,7 @@ Skill creation involves these steps:
 3. Plan reusable skill contents (scripts, references, templates)
 4. Initialize the skill (run init_skill.py)
 5. Edit the skill (implement resources and write SKILL.md)
-6. Publish the skill: Use either the GitHub Import workflow or the Browser Extension click-to-add workflow to install or update the skill in the user's account.
+6. Publish the skill: ALL skill changes (new skills, updates, improvements) MUST be pushed to the canonical `manus-skills` GitHub repository, followed by a deprecation/disable step for any older versions via the Manus browser.
 7. Iterate based on real usage
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
@@ -208,19 +208,26 @@ python /home/ubuntu/skills/skill-creator-v2/scripts/quick_validate.py <skill-nam
 
 If validation fails, fix the errors and run validation again.
 
-Once validated, you MUST publish the skill to the user's account using one of two viable workflows:
+Once validated, you MUST publish the skill to the user's account. **ALL skill changes, updates, and new skills MUST go through the canonical GitHub repository workflow going forward.**
 
-**Option A: The GitHub Import Workflow (Preferred for Version Control)**
-1. Push the skill directory to the user's canonical `manus-skills` GitHub repository (e.g., `https://github.com/Dreamrealai/manus-skills/tree/main/skills/<skill-name>`).
+**The Canonical GitHub Workflow (Mandatory)**
+1. Push the skill directory to the user's canonical `manus-skills` GitHub repository at `https://github.com/Dreamrealai/manus-skills/tree/main/skills/<skill-name>`.
 2. Use the `browser_navigate` tool to open `https://manus.im/app#settings/skills`.
-3. Click `+ Add` -> `Import from GitHub` and paste the repository subdirectory URL.
-4. For updates to existing skills, click the `...` menu on the skill in the Settings panel and select `Replace` to re-pull from GitHub.
+3. **For new skills:** Click `+ Add` -> `Import from GitHub` and paste the repository subdirectory URL.
+4. **For updates to existing skills:** You MUST first click the `...` menu on the existing skill in the Settings panel and select `Delete` to remove the outdated version, then use `+ Add` -> `Import from GitHub` to pull the fresh version from the canonical repo. (Note: The `Replace` option in the UI is for `.skill` file uploads, not GitHub syncs).
 
-**Option B: The Browser Extension Click-to-Add Workflow (For Quick Local Iteration)**
+**Deprecating Old Versions (Mandatory Step)**
+If you are creating a "v2" or replacing an entirely different skill:
+1. Use the `browser_navigate` tool to open `https://manus.im/app#settings/skills`.
+2. Locate the old/expired skill in the list.
+3. Click its toggle switch to turn it off (grey/disabled), or click the `...` menu and select `Delete` to remove it entirely if requested.
+4. This ensures the agent does not trigger conflicting or outdated instructions.
+
+*(Optional Fallback)* **The Browser Extension Click-to-Add Workflow (For Contextual Saving)**
 1. Ensure the browser extension was activated in Step 1.
 2. Use the `browser_navigate` tool to open the `manus.im` page.
 3. Locate the originating thread where the skill was requested.
-4. Click the "Move to project" or "Add to Project" button in the UI to save the skill contextually.
+4. Click the "Move to project" or "Add to Project" button in the UI to save the thread contextually.
 
 After publishing, you can also use the `message` tool to send the SKILL.md file as an attachment as a fallback:
 
