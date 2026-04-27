@@ -1,0 +1,226 @@
+{
+  "defaults": {
+    "chat": "gemini-3.1-pro-preview",
+    "analysis": "gemini-3.1-pro-preview",
+    "fast_chat": "gemini-3.0-flash-preview",
+    "cheap_bulk": "gemini-3.1-flash-lite",
+    "live": "gemini-3.1-flash-live",
+    "image": "gemini-3.1-flash-image-preview",
+    "video": "veo-3.1-text-to-video",
+    "music": "lyria-3-preview",
+    "tts": "gemini-2.5-pro-tts",
+    "research": "deep-research"
+  },
+  "models": {
+    "gemini-3.1-pro-preview": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-3.1-pro-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "reasoning",
+        "structured_output"
+      ],
+      "priority": 100,
+      "refresh_required": false,
+      "notes": "Default flagship model for difficult Gemini tasks."
+    },
+    "gemini-3.0-flash-preview": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-3-flash-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "multimodal"
+      ],
+      "priority": 85,
+      "refresh_required": false,
+      "notes": "Fast Gemini helper alias requested by the user."
+    },
+    "gemini-3.1-flash-lite": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-3.1-flash-lite-preview",
+      "task_types": [
+        "chat",
+        "analysis",
+        "batch"
+      ],
+      "priority": 70,
+      "refresh_required": false,
+      "notes": "Low-cost high-volume helper."
+    },
+    "gemini-3.1-flash-live": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-3.1-flash-live",
+      "task_types": [
+        "live",
+        "multimodal"
+      ],
+      "priority": 80,
+      "refresh_required": true,
+      "notes": "Live alias should be verified with refresh if it fails."
+    },
+    "deep-research": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "deep-research-pro-preview-12-2025",
+      "task_types": [
+        "research"
+      ],
+      "priority": 95,
+      "refresh_required": false,
+      "notes": "Deep research agent helper."
+    },
+    "gemma-4": {
+      "provider": "gemini",
+      "family": "gemma",
+      "api_model": "gemma-4",
+      "task_types": [
+        "chat",
+        "analysis"
+      ],
+      "priority": 60,
+      "refresh_required": true,
+      "notes": "Refresh before first use if exact deployment name is required."
+    },
+    "gemini-3.1-flash-image-preview": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-3.1-flash-image-preview",
+      "task_types": [
+        "image",
+        "image_editing"
+      ],
+      "priority": 100,
+      "refresh_required": false,
+      "notes": "Default Nano Banana image helper."
+    },
+    "gemini-2.5-pro-tts": {
+      "provider": "gemini",
+      "family": "gemini",
+      "api_model": "gemini-2.5-pro-preview-tts",
+      "task_types": [
+        "tts"
+      ],
+      "priority": 90,
+      "refresh_required": false,
+      "notes": "High-fidelity TTS helper."
+    },
+    "veo-3.1-image-to-video": {
+      "provider": "gemini",
+      "family": "veo",
+      "api_model": "veo-3.1-generate-preview",
+      "task_types": [
+        "video",
+        "image_to_video"
+      ],
+      "priority": 95,
+      "refresh_required": false,
+      "notes": "Video generation from an image prompt."
+    },
+    "veo-3.1-reference-to-video": {
+      "provider": "gemini",
+      "family": "veo",
+      "api_model": "veo-3.1-generate-preview",
+      "task_types": [
+        "video",
+        "reference_to_video"
+      ],
+      "priority": 95,
+      "refresh_required": false,
+      "notes": "Video generation from reference inputs."
+    },
+    "veo-3.1-text-to-video": {
+      "provider": "gemini",
+      "family": "veo",
+      "api_model": "veo-3.1-generate-preview",
+      "task_types": [
+        "video",
+        "text_to_video"
+      ],
+      "priority": 95,
+      "refresh_required": false,
+      "notes": "Default text-to-video helper."
+    },
+    "veo-3.1-start-end-frame-preview": {
+      "provider": "gemini",
+      "family": "veo",
+      "api_model": "veo-3.1-generate-preview",
+      "task_types": [
+        "video",
+        "start_end_frame"
+      ],
+      "priority": 92,
+      "refresh_required": true,
+      "notes": "Preview helper for start-frame/end-frame video flows."
+    },
+    "lyria-3-clip": {
+      "provider": "gemini",
+      "family": "lyria",
+      "api_model": "lyria-3-clip-preview",
+      "task_types": [
+        "music",
+        "audio"
+      ],
+      "priority": 88,
+      "refresh_required": false,
+      "notes": "Short-form music helper."
+    },
+    "lyria-3-preview": {
+      "provider": "gemini",
+      "family": "lyria",
+      "api_model": "lyria-3-pro-preview",
+      "task_types": [
+        "music",
+        "audio"
+      ],
+      "priority": 96,
+      "refresh_required": false,
+      "notes": "Default high-end Lyria music helper."
+    }
+  },
+  "last_refreshed_utc": "2026-04-15T02:06:01.227776Z",
+  "last_refresh_report": {
+    "provider": "gemini",
+    "refreshed_at_utc": "2026-04-15T02:06:01.227776Z",
+    "sources": {
+      "google_models_doc": {
+        "url": "https://docs.cloud.google.com/vertex-ai/generative-ai/docs/models",
+        "status": "ok",
+        "length": 269604
+      },
+      "google_monthly_ai": {
+        "url": "https://cloud.google.com/blog/products/ai-machine-learning/what-google-cloud-announced-in-ai-this-month",
+        "status": "ok",
+        "length": 285444
+      },
+      "recent_releases": {
+        "url": "https://pricepertoken.com/news/model-releases",
+        "status": "ok",
+        "length": 1045234
+      }
+    },
+    "matches": {
+      "gemini-3.1-pro-preview": true,
+      "gemini-3.0-flash-preview": true,
+      "gemini-3.1-flash-lite": true,
+      "gemini-3.1-flash-live": true,
+      "deep-research": true,
+      "gemma-4": true,
+      "gemini-3.1-flash-image-preview": true,
+      "gemini-2.5-pro-tts": true,
+      "veo-3.1-image-to-video": true,
+      "veo-3.1-reference-to-video": true,
+      "veo-3.1-text-to-video": true,
+      "veo-3.1-start-end-frame-preview": true,
+      "lyria-3-clip": true,
+      "lyria-3-preview": true
+    },
+    "recommendations": [],
+    "wrappers": []
+  }
+}
