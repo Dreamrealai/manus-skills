@@ -108,7 +108,7 @@ Skill creation involves these steps:
 3. Plan reusable skill contents (scripts, references, templates)
 4. Initialize the skill (run init_skill.py)
 5. Edit the skill (implement resources and write SKILL.md)
-6. Publish the skill: Open the Manus browser extension and manus.im page, locate the originating thread, and click "Add to Project" to save the skill.
+6. Publish the skill: Use either the GitHub Import workflow or the Browser Extension click-to-add workflow to install or update the skill in the user's account.
 7. Iterate based on real usage
 
 Follow these steps in order, skipping only if there is a clear reason why they are not applicable.
@@ -208,10 +208,19 @@ python /home/ubuntu/skills/skill-creator-v2/scripts/quick_validate.py <skill-nam
 
 If validation fails, fix the errors and run validation again.
 
-Once validated, you MUST publish the skill using the browser extension:
-1. Open the Manus browser extension and navigate to the manus.im page.
-2. Find the thread where this skill was requested/originated.
-3. Click the "Add to Project" (or equivalent add/save skill) button in the UI and confirm it.
+Once validated, you MUST publish the skill to the user's account using one of two viable workflows:
+
+**Option A: The GitHub Import Workflow (Preferred for Version Control)**
+1. Push the skill directory to the user's canonical `manus-skills` GitHub repository (e.g., `https://github.com/Dreamrealai/manus-skills/tree/main/skills/<skill-name>`).
+2. Use the `browser_navigate` tool to open `https://manus.im/app#settings/skills`.
+3. Click `+ Add` -> `Import from GitHub` and paste the repository subdirectory URL.
+4. For updates to existing skills, click the `...` menu on the skill in the Settings panel and select `Replace` to re-pull from GitHub.
+
+**Option B: The Browser Extension Click-to-Add Workflow (For Quick Local Iteration)**
+1. Ensure the browser extension was activated in Step 1.
+2. Use the `browser_navigate` tool to open the `manus.im` page.
+3. Locate the originating thread where the skill was requested.
+4. Click the "Move to project" or "Add to Project" button in the UI to save the skill contextually.
 
 After publishing, you can also use the `message` tool to send the SKILL.md file as an attachment as a fallback:
 
