@@ -28,6 +28,7 @@ This skill is intentionally redundant. The redundancy is the feature. Do not "op
 10. **NEVER produce a final PDF without bookmarks and a clickable table of contents.**
 11. **ALWAYS save a tracker log** (`tracker.md`) updated at every check-in with timestamps.
 12. **ALWAYS flag conflicting findings** between sources explicitly in the synthesis.
+12a. **ALWAYS resolve conflicts via live web search before synthesis.** When research streams disagree on factual claims (version numbers, release dates, licensing, pricing, feature availability, API status), the agent MUST perform live web search (using search tools or browser navigation to the authoritative source — e.g., GitHub releases page, npm registry, official docs) to determine the ground truth as of today's date. Do NOT let Opus 4.7 or any LLM arbitrate factual disputes from memory alone. The web-verified answer is the canonical answer. Document every verification in `synthesis/conflict_resolution_log.md` with: the conflicting claims, which streams made them, the verification URL visited, the verified answer, and the date checked.
 13. **ALWAYS attribute claims** to their originating stream (Gemini / ChatGPT / Claude / Manus-Social).
 14. **ALWAYS revisit and harvest streams that finish late.** If a stream finishes while you are working on other tasks, you MUST return to it, harvest the final output, and run the explicit `close` command on the tracker to clear the delivery gate. Do not silently move on.
 15. **ALWAYS enforce the Recency Protocol (April 2026).** Every quantitative claim MUST carry a `[Source, Month YYYY]` inline citation. Flag any data point older than October 2025 as STALE and explicitly caveat it. Prioritize Q1 2026 earnings calls and recent data.
@@ -369,12 +370,40 @@ This report exceeds 30 pages. Trim to approximately 20-25 pages by:
 Do NOT remove unique findings, citations, or any content from a single-source section.
 ```
 
-## Phase 5 — Aggregation via Opus 4.7
+## Phase 4b — Conflict Resolution via Live Web Search (MANDATORY)
 
-**Tool:** Opus 4.7 via OpenRouter API (`python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py --alias opus-4.7`). Opus 4.7 is the sole synthesizer — it selects the best insights from all streams, resolves version conflicts, and produces the definitive best-of-all report.
+**Goal:** Before Opus 4.7 synthesizes, the agent MUST identify and resolve every factual conflict between research streams using live web search. This prevents LLM hallucination from contaminating the final report.
 
 **Procedure:**
-1. Upload (or paste in chunks if needed) all four raw reports + the Opus planning memo + the meta-question.
+1. Compare all harvested raw reports and identify every factual disagreement: version numbers, release dates, licensing terms, pricing, feature claims, API availability, GitHub stars, maintenance status.
+2. For EACH conflict, perform a live web search or navigate directly to the authoritative source:
+   - **Version numbers**: Check the GitHub releases page or npm registry (`https://github.com/<org>/<repo>/releases` or `https://www.npmjs.com/package/<pkg>`)
+   - **Licensing**: Check the LICENSE file in the repo or the package.json
+   - **Pricing**: Check the official pricing page
+   - **Feature claims**: Check the official documentation or changelog
+   - **Stars/maintenance**: Check the GitHub repo directly
+3. Save all verifications to `synthesis/conflict_resolution_log.md` in this format:
+
+```markdown
+## Conflict: <component name>
+- **Stream A claim** (<stream>): <claim>
+- **Stream B claim** (<stream>): <claim>
+- **Verification URL**: <url visited>
+- **Verified answer**: <ground truth as of today>
+- **Date checked**: <YYYY-MM-DD>
+- **Winner**: <which stream was correct>
+```
+
+4. Feed the `conflict_resolution_log.md` to Opus 4.7 along with the raw reports so it uses verified facts, not LLM guesses.
+
+**Hard rule:** The agent MUST NOT proceed to Phase 5 aggregation until all identified conflicts have been web-verified. If a conflict cannot be verified (source is down, paywalled, etc.), document it as `UNVERIFIED` with the reason and flag it in the final report.
+
+## Phase 5 — Aggregation via Opus 4.7
+
+**Tool:** Opus 4.7 via OpenRouter API (`python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py --alias opus-4.7`). Opus 4.7 is the sole synthesizer — it selects the best insights from all streams, resolves version conflicts using the web-verified conflict resolution log, and produces the definitive best-of-all report.
+
+**Procedure:**
+1. Upload (or paste in chunks if needed) all four raw reports + the Opus planning memo + the meta-question + `synthesis/conflict_resolution_log.md`.
 2. Issue the following aggregation directive:
 
 ```text
@@ -550,7 +579,8 @@ Before declaring the skill complete, confirm **every** item:
 - [ ] Check-ins performed on cadence and logged
 - [ ] If ChatGPT exceeded 60 min: tracker closed as `timed_out` AND auto-timer fallback set for 1-hour follow-up
 - [ ] All reports harvested with YAML headers
-- [ ] `synthesis/aggregated_report.md` generated via Opus 4.7
+- [ ] `synthesis/conflict_resolution_log.md` generated with web-verified resolutions for all inter-stream conflicts
+- [ ] `synthesis/aggregated_report.md` generated via Opus 4.7 (using verified conflict resolutions)
 - [ ] `synthesis/conflicts_ledger.md` extracted
 - [ ] Page count check performed (word count ÷ 400 = estimated pages; must be 10-30)
 - [ ] Executive Summary present (1-2 pages)
