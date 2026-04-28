@@ -224,6 +224,129 @@ python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
 
 ---
 
+## 🚨 MANDATORY LAYOUT VARIATION SYSTEM
+
+Every deck MUST use at least 6 of these 8 named layout patterns. **No two consecutive slides may use the same pattern.** The pattern name must be noted in a comment at the top of each slide's HTML.
+
+### Pattern 1: HERO-STAT — Giant Number Callout
+```
+Full-width background | 1-3 giant numbers (80-120px) centered | 1 sentence headline above | 2-line supporting context below
+Example use: Market size, growth rate, key metric
+Max words: 25 total
+```
+
+### Pattern 2: SPLIT-IMAGE — 50/50 Photo + Text
+```
+Left 50%: full-bleed photography (object-fit: cover, height: 720px)
+Right 50%: white/cream background | Title 32px | 3-4 bullets at 16px | 40px padding
+Max words on text side: 60
+```
+
+### Pattern 3: CHART-DOMINANT — Data Visualization
+```
+Title bar at top (60px tall) | Chart takes 65% of slide height | Source line at bottom
+Right sidebar (25% width): 2-3 insight callouts in gold accent boxes
+Max words outside chart: 40
+```
+
+### Pattern 4: THREE-COLUMN GRID — Comparison/Framework
+```
+3 equal columns with icon/number at top of each | Column title 20px bold | 2-3 lines body text 16px
+No borders between columns — use background color alternation or spacing
+Max words per column: 30
+```
+
+### Pattern 5: FULL-BLEED-OVERLAY — Section Divider / Impact Slide
+```
+Full-bleed photography or brand color | Semi-transparent dark overlay (rgba 0,0,0,0.5)
+Centered text: 1 headline 48-64px white | 1 subline 24px white
+Max words: 15
+```
+
+### Pattern 6: INSIGHT-QUOTE — Pull Quote
+```
+Large quotation mark graphic | Quote text 28-36px centered | Attribution 16px below
+Left accent bar in brand color | Clean white background
+Max words: 35
+```
+
+### Pattern 7: TABLE-MATRIX — Competitive/Comparison
+```
+Title at top | Full-width table with alternating row colors | Max 6 rows, 5 columns
+Header row in brand primary color | Body text 14px minimum in table cells
+No more than 8 words per cell
+```
+
+### Pattern 8: TIMELINE-PROCESS — Sequential Flow
+```
+Horizontal timeline bar spanning full width | 4-6 nodes with icons
+Above/below alternating labels | Year/date prominent at 20px | Description 14px
+Brand accent color for timeline bar
+```
+
+---
+
+## 🚨 DENSITY RULES — WHAT "TOO DENSE" MEANS
+
+These are the most common failures. Each is a MAJOR_ISSUE in the audit.
+
+### ❌ WRONG — Text Wall (DO NOT DO THIS)
+```
+Slide title: "Consumer Purchase Drivers"
+• Consumers increasingly seek premium, artisanal products with transparent sourcing and authentic brand stories
+• Price sensitivity varies by income bracket with HHI >$100K showing 3.2x higher premium butter purchase intent  
+• Health and wellness positioning drives purchase for 67% of premium butter buyers who cite grass-fed and high-fat content
+• Social media influence, particularly TikTok "ButterTok" content, drives trial among 18-34 demographic
+• Retail channel preference shifting toward specialty and natural grocery with Whole Foods and Sprouts outperforming
+• Gifting occasion represents 18% of premium butter purchases with seasonal spikes in Q4
+```
+**Problem:** 6 bullets, 120+ words, no visual, no hierarchy, no breathing room.
+
+### ✅ CORRECT — Focused Insight Slide
+```
+Slide title: "3 Reasons Shoppers Trade Up to Premium Butter"
+[Large icon] HEALTH — "85% butterfat, grass-fed, no additives" (18px)
+[Large icon] TASTE — "Richer flavor, higher smoke point" (18px)  
+[Large icon] STORY — "Farmer-sourced, American-made" (18px)
+[Bottom bar] Source: Mintel Premium Butter Report, Jan 2026
+```
+**Result:** 3 points, 30 words, clear visual hierarchy, instant comprehension.
+
+### Hard Density Limits (ENFORCED IN AUDIT)
+- **Maximum 5 bullet points per slide** — if you have 6+, split into two slides
+- **Maximum 15 words per bullet** — if longer, it's a paragraph, not a bullet
+- **Maximum 120 words total per content slide** (title excluded)
+- **Minimum 35% of slide area must be non-text** (image, chart, whitespace, icon)
+- **No paragraph blocks** — if text is more than 2 lines without a break, it's a paragraph and must be redesigned
+
+---
+
+## 🚨 COLOR SYSTEM — RED BARN BRAND (AND GENERAL RULES)
+
+### For Red Barn Creamery Specifically
+```
+Background (content slides): #FAFAF5 (warm off-white/cream)
+Background (cover + section dividers): #8B1A1A (barn red)
+Primary text: #1A1A1A (near-black — NOT pure black)
+Secondary text: #4A4A4A (dark grey)
+Accent 1: #D4A017 (butter gold — for callouts, highlights, icons)
+Accent 2: #8B1A1A (barn red — for headers, borders, chart bars)
+Never use: pure white (#FFFFFF) as background — too sterile
+Never use: #D4A017 gold as body text — only for accent elements
+Never use: red text on red background
+```
+
+### General Contrast Rules (ALL DECKS)
+- White/cream background + dark text (#1A1A1A): ✓ Always safe
+- Dark background + white text: ✓ Safe if background is ≥ 60% dark
+- Gold accent on dark background: ✓ Use sparingly (1-2 elements per slide)
+- **NEVER:** Light grey text (#999) on white background — fails WCAG AA
+- **NEVER:** Yellow/gold text on white background — fails contrast
+- **NEVER:** Red text on dark red background — invisible
+- **NEVER:** Multiple accent colors on the same slide — pick one per slide
+
+---
+
 ## Workflow Decision Table
 
 | Situation | Required workflow |
