@@ -1,108 +1,166 @@
 ---
 name: slide-production
-description: Create, revise, export, and reconstruct presentation slides and decks. Use whenever the user says slides, slide deck, deck, powerpoint, PowerPoint, presentation, pitch deck, keynote, PPT, or PPTX, or asks to make, edit, fix, export, recreate, or review a deck. Treat these requests as slide-production work by default. Always create the final deck in Manus native slides canvas first, then export both PPTX and PDF, run mandatory dual audits (Opus 4.7 formatting + image enrichment → fix → GPT-5.5-pro fact-check + image/chart suggestions → fix), and save final deliverables to Google Drive. Both auditors receive the raw research context to suggest specific images and charts for Manus to execute.
+description: Create, revise, export, and reconstruct presentation slides and decks. Use whenever the user says slides, slide deck, deck, powerpoint, PowerPoint, presentation, pitch deck, keynote, PPT, or PPTX, or asks to make, edit, fix, export, recreate, or review a deck. Primary slide production LLM is Opus 4.7 via OpenRouter (alias: opus-4.7). CRITICAL: Always upload all images to Google Drive as public URLs BEFORE building slides — Manus frequently drops local image paths when using OpenRouter API. Enforces strict density/layout/color rules, mandatory dual audit cycle (Opus 4.7 formatting → fix → GPT-5.5-pro fact-check → fix), and Google Drive delivery.
 ---
 
 # Slide Production
 
 Use this skill for all presentation work. The mandatory workflow is:
 
-**Build in Manus canvas** → **Export PDF** → **Opus 4.7 audit (formatting + image gaps + research-informed suggestions)** → **Manus fixes all MAJOR/BLANK issues + adds images/charts** → **Re-export PDF** → **GPT-5.5-pro audit (fact-check + hallucination + image/chart log)** → **Manus applies all factual fixes + additional enrichments** → **Final export PPTX + PDF** → **Save to Google Drive**
+**Upload images to Google Drive (public URLs)** → **Build in Manus canvas** → **Export PDF** → **Opus 4.7 audit (formatting + image gaps + research-informed suggestions)** → **Manus fixes all MAJOR/BLANK issues** → **Re-export PDF** → **GPT-5.5-pro audit (fact-check + hallucination + image/chart log)** → **Manus applies all factual fixes** → **Final export PPTX + PDF** → **Save to Google Drive**
 
 ---
 
-## Workflow Decision Table
+## 🚨 PRIMARY SLIDE PRODUCTION LLM: OPUS 4.7
 
-| Situation | Required workflow |
-|---|---|
-| New presentation request | Build → dual audit → fix cycle → Drive |
-| Edits to existing deck | Revise → dual audit → fix cycle → Drive |
-| Uploaded deck reconstruction | Reconstruct in canvas → dual audit → fix cycle → Drive |
-| Export/handoff only | Ensure in canvas → export → dual audit → fix cycle → Drive |
+**All slide HTML generation MUST use Opus 4.7 via OpenRouter** (alias: `opus-4.7`).
 
----
-
-## Non-Negotiable Global Rules
-
-### Trigger Rules
-Any user mention of **slides**, **deck**, or **powerpoint** triggers this skill. Default to slide-production behavior unless the user is unmistakably asking for a definition or non-deliverable explanation.
-
-### Working Surface
-The final working deck MUST live in **Manus native slides canvas**. Do not treat standalone PPTX, browser-only HTML, or PDF as the primary working surface.
-
-### Export Requirements
-Every completed deck MUST be exported in **two formats**: **PPTX** and **PDF**. Both are mandatory. The PDF is the required review format for audits.
-
-### Google Drive
-Every completed deck MUST be saved to **Google Drive**. Read `gws-best-practices` before the first Google Workspace operation. Use user-specified folder, existing project folder, or `Manus_Work-in-progress_Donotshare` as fallback.
-
-### Editable Text
-All slide text MUST remain **editable**. Never flatten text into images.
-
-### Punctuation
-Default to **no terminal periods** in slide copy (titles, headers, bullets, labels, callouts). Use periods only for prose paragraphs, explicit user request, or formal citations.
-
-### No Negative Offsets
-Never use negative margins, negative top offsets, or container-level hacks to hide overflow. Redesign the composition instead.
+- Use `openrouter_chat.py --alias opus-4.7` for any programmatic slide generation
+- Sonnet 4.6 (alias: `sonnet-4.6`) is the fallback if Opus is unavailable or times out
+- **Never use GPT models for slide HTML generation** — they produce inconsistent HTML/CSS
+- When using Manus native `slide_edit` tool, the tool itself handles LLM routing; no alias needed
 
 ---
 
-## 🚨 MANDATORY VISUAL STANDARDS (Enforced in Every Audit)
+## 🚨 CRITICAL: IMAGE PRESERVATION VIA GOOGLE DRIVE PUBLIC URLS
 
-### Font Size Minimums
+**This is the #1 failure mode in slide production.** When Opus 4.7 (or any OpenRouter model) generates slide HTML, it frequently drops or ignores local file paths for images. The result is slides with missing images or broken `<img>` tags.
+
+### Mandatory Image Upload Workflow (BEFORE building any slides)
+
+**Step 1: Collect all images**
+```bash
+# List all available brand/product images
+ls /path/to/brand_assets/
+ls /home/ubuntu/upload/search_images/
+```
+
+**Step 2: Upload ALL images to Google Drive and get public URLs**
+```bash
+# Upload each image using gws or manus-upload-file
+manus-upload-file /path/to/image1.png  # Returns CDN URL
+manus-upload-file /path/to/image2.jpg  # Returns CDN URL
+
+# OR use gws to upload to a dedicated Images folder in the project Drive folder
+gws drive files create --params '{"name": "product_main.png", "parents": ["FOLDER_ID"]}'
+```
+
+**Step 3: Build an image URL manifest**
+Create `image_manifest.json` BEFORE building any slides:
+```json
+{
+  "product_main": "https://files.manuscdn.com/...",
+  "product_barn": "https://files.manuscdn.com/...",
+  "kv_hero": "https://files.manuscdn.com/...",
+  "competitor_kerrygold": "https://files.manuscdn.com/...",
+  "farm_lifestyle": "https://files.manuscdn.com/..."
+}
+```
+
+**Step 4: Reference ONLY public URLs in slide HTML**
+```html
+<!-- CORRECT — always use public URL -->
+<img src="https://files.manuscdn.com/abc123.png" style="width: 300px; height: 200px; object-fit: contain;" />
+
+<!-- WRONG — local paths get dropped by OpenRouter -->
+<img src="/home/ubuntu/brand_assets/product_main.png" />
+```
+
+### When Using Manus Native `slide_edit` Tool
+When using the Manus `slide_edit` tool (not OpenRouter API), local absolute paths ARE supported:
+```html
+<img src="/home/ubuntu/brandinsights_red-barn_20260427_1231/brand_assets/kv_rb_v11.png" style="width: 400px; height: 280px; object-fit: contain;" />
+```
+But still prefer public URLs for portability and to avoid path loss during export.
+
+### Image Preservation Checklist
+Before finalizing any slide:
+- [ ] Every `<img>` tag uses a public CDN URL or verified absolute local path
+- [ ] No `<img>` tags with relative paths (`./`, `../`)
+- [ ] No `<img>` tags with placeholder `src` values
+- [ ] All images have explicit `width` and `height` in pixels (not percentages)
+- [ ] All images use `object-fit: contain` or `object-fit: cover` as appropriate
+
+---
+
+## 🚨 MANDATORY VISUAL QUALITY STANDARDS
+
+These standards are enforced in EVERY audit. Violations are MAJOR_ISSUES.
+
+### 1. Density & Word Count Rules
+| Slide Type | Max Words (excl. title) | Max Bullet Points |
+|---|---|---|
+| Data / Market slide | 80 words | 5 bullets |
+| Strategy / Framework | 100 words | 6 bullets |
+| Persona / Consumer | 60 words | 4 bullets |
+| Executive Summary | 120 words | 8 bullets |
+| Section Divider | 20 words | 0 bullets |
+| Cover / Title | 15 words | 0 bullets |
+
+**Text-wall rule:** Any slide exceeding these limits MUST be split into two slides or converted to a visual (chart, diagram, table).
+
+### 2. Font Size Minimums
 | Element | Minimum Size |
 |---|---|
 | Slide titles | 28px |
-| Section headers | 22px |
+| Section headers / H2 | 22px |
 | Body text / bullets | 16px |
-| Chart labels / legends | 12px |
-| Footnotes / source lines | 10px |
+| Chart labels / axis text | 12px |
+| Source / footnote lines | 10px |
 
-### Visual Density Rules
-- **Maximum 60% text coverage** per slide (excluding titles)
-- **Minimum 1 visual element per slide**: chart, image, icon, diagram, or illustration
-- **No text-wall slides**: Any slide exceeding 60% text MUST be split or visualized
-- **Data slides MUST have a Chart.js or D3.js chart** — never a data slide with only text bullets
+**Never use 11px, 12px, or 13px for body text.** This is the most common failure mode.
 
-### Margin Standards
-- **40px margins** on all four sides (top, bottom, left, right)
-- Consistent across all slides in the deck
-- Content must not touch slide edges
+### 3. Layout & Spacing Rules
+- **40px minimum margins** on all four sides — content must NOT touch slide edges
+- **Consistent margin across ALL slides** — never mix 20px and 40px margins in the same deck
+- **No large empty white areas** — if a slide has >30% empty space on one side, redistribute content or add a visual
+- **No blue dashed borders** (`border: 1px dashed #007bff`) — this is a website UI pattern, not a slide pattern
+- **No card shadows** (`box-shadow`) on content containers
+- **No rounded corners** (`border-radius`) on primary content containers
+- **Full-width layouts** — use the entire 1280px width; never leave half the slide blank
 
-### Brand Color Enforcement
-- Every slide MUST use at least one brand color (from user-provided palette or extracted from logo)
-- Title bars, accent elements, or icons must carry brand identity
-- No plain white backgrounds without brand accent elements
+### 4. Color Rules
+- **Brand colors only** — use the provided brand palette exclusively; no random blues, greens, or greys
+- **Background consistency** — all content slides MUST share the same background color/treatment
+- **Accent color discipline** — use accent colors (gold, etc.) for 1-2 elements per slide maximum; never as body text color
+- **Contrast requirement** — body text must have ≥ 4.5:1 contrast ratio against background
+- **No white-on-white** — never place white text on a white or near-white background
+- **No light grey text on white** — minimum body text color: `#333333` on white backgrounds
 
-### Slide-Type Visual Requirements
-
-| Slide Type | Required Visual Elements |
+### 5. Visual Element Requirements
+| Slide Type | Required Visual |
 |---|---|
-| Data / Market slides | Chart (bar, line, pie, bubble) with 12px+ labels + source line |
-| Persona / Consumer slides | Human imagery (photo, illustration, or avatar) |
-| Framework / Strategy slides | Diagram (2x2 matrix, flowchart, pyramid, or process flow) |
-| Competitive slides | Positioning matrix OR comparison table with brand logos |
-| Timeline / History slides | Visual timeline with dates and milestones |
-| Title / Cover slides | Hero image, brand logo, or brand photography |
-| Executive Summary | 2-3 key metrics with icons; pull-quote or highlight box |
-| Quote / Insight slides | Large pull-quote with speaker attribution + supporting image |
-| Section Dividers | Full-bleed brand image or bold typographic treatment |
+| Data / Market | Chart (Chart.js or D3.js) with source line |
+| Persona / Consumer | Human photo or illustrated avatar |
+| Framework / Strategy | Diagram (2×2, funnel, pyramid, process flow) |
+| Competitive | Positioning matrix OR comparison table |
+| Timeline | Visual timeline with dates |
+| Cover | Full-bleed hero image or brand photography |
+| Executive Summary | 2-3 stat callouts with icons |
+| Section Divider | Full-bleed brand image or bold typographic treatment |
+| Quote / Insight | Large pull-quote with attribution |
 
-### Image Enrichment Rules
-- **Minimum 40% of slides** must include a photographic or illustrative image (not just charts or icons)
-- Brand product photography MUST appear on at least 3 slides in any brand deck
-- Lifestyle/contextual imagery (people using the product, relevant environments) MUST appear on consumer insight slides
-- Competitive slides should include competitor brand logos or product imagery where available
-- Images must be **high-resolution, watermark-free**, and **object-fit: contain** in their containers
-- **Never use placeholder or stock imagery that contradicts brand identity**
+**Minimum image rule:** ≥ 40% of slides must include a photographic or illustrative image (not just icons or charts). Brand product photography must appear on ≥ 3 slides in any brand deck.
+
+### 6. Layout Variety Rule
+- **No two consecutive slides** may use the same layout structure
+- Alternate between: full-width text+chart, split left/right, 3-column grid, hero image with overlay text, stat callout grid
+- Section dividers and cover slides are exempt from this rule
+
+### 7. Chart Quality Rules
+- All charts use **Chart.js v3** (not v2 — no `horizontalBar` type)
+- Wrap every `<canvas>` in a parent div with explicit pixel height: `<div style="height: 300px;"><canvas></canvas></div>`
+- Every chart MUST have a **source line** below it: `Source: [Source Name], [Month YYYY]`
+- Chart colors MUST use the brand palette (not Chart.js defaults)
+- No radar charts — they are visually poor
 
 ---
 
-## 🚨 MANDATORY DUAL AUDIT SYSTEM WITH RESEARCH CONTEXT
+## 🚨 MANDATORY DUAL AUDIT SYSTEM
 
-After every deck is generated, you MUST run two sequential audits. **Both auditors receive the raw research document** (aggregated_research.md, master_research_raw.md, or equivalent) so they can suggest specific images, charts, and data visualizations that Manus should then execute.
+After every deck is generated, run two sequential audits. **Both auditors receive the raw research document** so they can suggest specific images, charts, and data visualizations.
 
-> **NON-NEGOTIABLE:** Do NOT deliver the deck to the user until BOTH audit rounds are complete and all MAJOR_ISSUES, BLANK_BROKEN, LIKELY_HALLUCINATED, and CONTRADICTED items are fixed.
+> **NON-NEGOTIABLE:** Do NOT deliver the deck until BOTH audit rounds are complete and ALL MAJOR_ISSUES, BLANK_BROKEN, LIKELY_HALLUCINATED, and CONTRADICTED items are fixed.
 
 ---
 
@@ -110,376 +168,197 @@ After every deck is generated, you MUST run two sequential audits. **Both audito
 
 **Trigger:** Immediately after first PDF export.
 
-**Preparation — Provide Research Context:**
-Before running the Opus audit, prepare a `research_context_summary.md` file containing:
-1. The top 20 key facts/statistics from the research (with sources)
-2. The list of available brand images (file paths)
-3. The list of available competitor images or logos
-4. Any charts or data tables from the research that could be visualized
-
-Pass this file alongside the PDF to Opus so it can suggest specific, executable improvements.
+**Preparation:**
+1. Upload PDF via `manus-upload-file` to get a public URL
+2. Prepare `research_context_summary.md` with top 20 facts, available image URLs, and data tables
+3. Pass both to Opus
 
 **Method:**
 ```bash
-# Upload PDF to S3 for Opus vision access
 PDF_URL=$(manus-upload-file /path/to/deck_v1.pdf | grep -o 'https://[^ ]*')
 
-# Run Opus audit with research context
 python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
-  --alias opus \
-  --prompt-file /path/to/opus_audit_prompt.txt \
-  --output /path/to/opus_formatting_audit.md
+  --alias opus-4.7 \
+  --prompt "You are auditing a presentation. PDF URL: $PDF_URL. Research context: [paste research_context_summary.md]. For EVERY slide, provide: slide number, title, grade (A/B/C/D/F), status (PASS/MINOR_ISSUES/MAJOR_ISSUES/BLANK_BROKEN), list of formatting issues, list of visual issues, and a specific image/chart recommendation. After all slides, provide SYSTEMIC_ISSUES and IMAGE_ENRICHMENT_PLAN." \
+  --output /path/to/opus_audit.md
 ```
 
-**Opus Audit Prompt Template:**
-```
-You are a senior presentation designer and McKinsey deck quality reviewer. You are auditing a presentation PDF AND have access to the raw research document below.
+**Required Output:** `opus_formatting_audit.md` with:
+- Per-slide table: Slide | Title | Grade | Status | Top Issue
+- IMAGE_ENRICHMENT_PLAN: ordered list of top 10 image/chart additions
+- SYSTEMIC_ISSUES: patterns across 3+ slides
 
-RESEARCH CONTEXT:
-[Insert research_context_summary.md content here — top facts, available images, data tables]
-
-AVAILABLE BRAND IMAGES:
-[List file paths of available images]
-
-TASK: Audit this presentation slide by slide for formatting, visual design, and image enrichment opportunities.
-
-For EVERY slide, evaluate and output a JSON object:
-{
-  "slide_number": int,
-  "slide_title": string,
-  "status": "PASS" | "MINOR_ISSUES" | "MAJOR_ISSUES" | "BLANK_BROKEN",
-  "grade": "A" | "B" | "C" | "D" | "F",
-  "formatting_issues": [list of specific issues],
-  "visual_issues": [list of specific issues — missing charts, no images, text-wall],
-  "font_violations": [list of elements below minimum size],
-  "margin_violations": [list of margin issues],
-  "brand_color_issues": [list of brand color problems],
-  "image_opportunity": {
-    "recommended": true/false,
-    "type": "product_photo" | "lifestyle_photo" | "chart" | "diagram" | "competitor_logo" | "icon_set",
-    "specific_suggestion": "Exact description of what image/chart to add and where",
-    "data_to_visualize": "If chart: exact data points from research to use",
-    "search_query": "If photo needed: exact search query to find the right image",
-    "available_local_image": "If a local image from the available list fits, specify the path"
-  },
-  "priority_fix": "Single most important fix for this slide"
-}
-
-After the JSON array, provide:
-- OVERALL_GRADE: A/B/C/D/F
-- SYSTEMIC_ISSUES: Patterns on 3+ slides
-- IMAGE_ENRICHMENT_PLAN: Ordered list of the top 10 image/chart additions that would most improve the deck
-- ROOT_CAUSES: What caused the most common failures
-```
-
-**Required Output:** Save to `opus_formatting_audit.md`. Must include:
-- Full JSON audit array
-- Summary table (Slide | Title | Status | Grade | Priority Fix)
-- IMAGE_ENRICHMENT_PLAN with specific, executable suggestions
-
----
-
-### Audit 1 Fix Cycle — Manus Executes All Fixes
-
-After receiving Opus audit, Manus MUST:
-
-**Step A — Fix Structural Issues (Mandatory):**
-1. Rebuild ALL slides marked `BLANK_BROKEN`
-2. Fix ALL slides marked `MAJOR_ISSUES` (address every formatting_issue and visual_issue)
+**Fix Cycle After Opus Audit:**
+1. Rebuild ALL `BLANK_BROKEN` slides
+2. Fix ALL `MAJOR_ISSUES` slides (address every formatting and visual issue)
 3. Fix ALL slides graded D or F
-4. Enforce font minimums: body ≥ 16px, titles ≥ 28px, chart labels ≥ 12px
-5. Fix all margin violations (40px on all sides)
-6. Apply brand colors to any slides missing them
-
-**Step B — Execute Image Enrichment Plan (Mandatory):**
-For each item in Opus's IMAGE_ENRICHMENT_PLAN:
-1. **If chart suggested:** Build the chart in Chart.js or D3.js using the exact data points specified. Add source line.
-2. **If local image available:** Use the specified file path in the slide HTML with `object-fit: contain`.
-3. **If search needed:** Run `search` tool with the exact query Opus provided. Download the best result. Embed in slide.
-4. **If diagram suggested:** Build the diagram in HTML/CSS using brand colors.
-5. Document each image/chart added in `image_enrichment_log.md`.
-
-**Step C — Re-export:**
-Re-export as `deck_v2.pdf` after all fixes.
+4. Enforce font minimums, margin rules, density limits
+5. Execute IMAGE_ENRICHMENT_PLAN: add all suggested charts/images
+6. Re-export as `deck_v2.pdf`
 
 ---
 
-### Audit 2: GPT-5.5-Pro Fact-Check + Image/Chart Suggestion Audit
+### Audit 2: GPT-5.5-Pro Fact-Check + Additional Image Audit
 
-**Trigger:** After Opus audit fixes are complete and v2 PDF is exported.
-
-**Preparation — Provide Research Context:**
-Pass the same `research_context_summary.md` plus the full `aggregated_research.md` (or equivalent) to GPT-5.5-pro so it can:
-1. Cross-reference claims against the source research
-2. Identify data points in the research that are NOT yet visualized in the deck
-3. Suggest additional charts or images that would strengthen specific slides
+**Trigger:** After Opus fixes and v2 PDF exported.
 
 **Method:**
 ```bash
+PDF_URL_V2=$(manus-upload-file /path/to/deck_v2.pdf | grep -o 'https://[^ ]*')
+
 python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
   --alias gpt-5.5-pro \
   --reasoning xhigh \
-  --prompt-file /path/to/gpt55_factcheck_prompt.txt \
-  --output /path/to/gpt55_factcheck_audit.md
-```
-**Fallback:** If `gpt-5.5-pro` fails, use `gpt-5.5-xhigh`. If that fails, use Gemini 3.1 Pro.
-
-**GPT-5.5-Pro Audit Prompt Template:**
-```
-You are a senior fact-checker and data visualization strategist auditing a presentation deck. You have access to the raw research document that was used to build this deck.
-
-RAW RESEARCH:
-[Insert full aggregated_research.md content here]
-
-AVAILABLE BRAND IMAGES:
-[List file paths of available images]
-
-TASK: Audit this deck for (1) factual accuracy and hallucinations, and (2) missed data visualization opportunities.
-
-For EVERY slide with factual claims, output a JSON object:
-{
-  "slide_number": int,
-  "slide_title": string,
-  "factual_status": "VERIFIED" | "PLAUSIBLE" | "UNVERIFIED" | "LIKELY_HALLUCINATED" | "CONTRADICTED",
-  "confidence_score": 0-100,
-  "suspicious_claims": [list of claims needing verification],
-  "hallucination_flags": [list of likely fabricated claims with explanation],
-  "missing_citations": [list of claims needing (Source, Year) format],
-  "internal_contradictions": [list of claims contradicting other slides],
-  "research_data_unused": [list of data points from the research NOT yet in the deck that would strengthen this slide],
-  "additional_image_opportunity": {
-    "recommended": true/false,
-    "specific_suggestion": "Exact description of image/chart to add",
-    "data_source": "Which part of the research to use",
-    "chart_type": "bar/line/pie/scatter/table/none",
-    "search_query": "If photo: exact search query"
-  },
-  "recommended_fix": "Specific action to resolve all issues on this slide"
-}
-
-After the JSON array, provide:
-- OVERALL_CONFIDENCE: 0-100
-- VERIFIED_FACTS: Top 10 claims confirmed accurate
-- HALLUCINATION_REPORT: Detailed explanation of any likely hallucinations
-- CITATION_GAPS: Consolidated list of all missing citations
-- UNUSED_RESEARCH_OPPORTUNITIES: Top 5 data points from the research not yet in the deck
-- ADDITIONAL_IMAGE_LOG: Ordered list of additional images/charts to add (beyond what Opus already suggested)
+  --prompt "Fact-check this presentation PDF ($PDF_URL_V2) against this research: [paste full research]. For every slide: factual_status (VERIFIED/PLAUSIBLE/UNVERIFIED/LIKELY_HALLUCINATED/CONTRADICTED), suspicious claims, missing citations, and additional image/chart opportunities not yet in the deck." \
+  --output /path/to/gpt55_audit.md
 ```
 
-**Required Output:** Save to `gpt55_factcheck_audit.md`. Must include:
-- Full JSON audit array
-- Summary table (Slide | Title | Factual Status | Confidence | Key Issue)
-- ADDITIONAL_IMAGE_LOG with specific, executable suggestions
+**Fallback:** If `gpt-5.5-pro` fails → use `gpt-5.5-xhigh` → if that fails → use Gemini 3.1 Pro.
+
+**Fix Cycle After GPT-5.5 Audit:**
+1. Remove/correct ALL `LIKELY_HALLUCINATED` claims
+2. Resolve ALL `CONTRADICTED` claims across entire deck
+3. Add `(Source, Year)` citations to all flagged items
+4. Execute ADDITIONAL_IMAGE_LOG: add remaining charts/images
+5. Export final PPTX and PDF
 
 ---
 
-### Audit 2 Fix Cycle — Manus Executes All Fixes
+## Workflow Decision Table
 
-After receiving GPT-5.5-pro audit, Manus MUST:
-
-**Step A — Fix Factual Issues (Mandatory):**
-1. Remove or correct ALL claims marked `LIKELY_HALLUCINATED`
-2. Resolve ALL `CONTRADICTED` claims (determine correct value, fix ALL instances across deck)
-3. Add `(Source, Year)` citations to ALL items in missing_citations
-4. Tag retained unverifiable claims as `[Unverified]`
-
-**Step B — Execute Additional Image/Chart Log (Mandatory):**
-For each item in GPT-5.5-pro's ADDITIONAL_IMAGE_LOG:
-1. **If chart:** Build in Chart.js/D3.js using the specified research data. Add source line.
-2. **If photo:** Search with the exact query. Download best result. Embed in slide.
-3. **If unused research data:** Add a new data callout, stat box, or chart to the relevant slide.
-4. Append all additions to `image_enrichment_log.md`.
-
-**Step C — Final Export:**
-1. Export final PPTX: `{Project}_Final.pptx`
-2. Export final PDF: `{Project}_Final.pdf`
-3. Save both to Google Drive
-4. Include audit summary in delivery message
-
----
-
-## Image Enrichment Log Format
-
-Maintain `image_enrichment_log.md` throughout both fix cycles:
-
-```markdown
-# Image Enrichment Log
-
-## Round 1 (Opus 4.7 Suggestions)
-| Slide | Type | Action Taken | Source/Path |
-|-------|------|--------------|-------------|
-| 3 | Chart | Added bar chart: US butter market growth 2020-2025 | Circana 2025 data from research |
-| 7 | Product photo | Added Red Barn 85% butterfat product image | /path/to/product_main.png |
-| 12 | Lifestyle photo | Added farm/pastoral image | Downloaded from search: "golden hour farm pastoral" |
-
-## Round 2 (GPT-5.5-Pro Suggestions)
-| Slide | Type | Action Taken | Source/Path |
-|-------|------|--------------|-------------|
-| 5 | Chart | Added Kerrygold vs Vital Farms market share pie chart | Ornua 2025 Annual Report |
-| 18 | Competitor logos | Added Kerrygold, Vital Farms, Land O'Lakes logos | Downloaded from brand sites |
-```
-
----
-
-## Citation Standards for Slides
-
-### Quantitative Claims
-Every number, percentage, or market figure MUST have a parenthetical citation:
-```
-Premium butter market growing at 10% CAGR (Nielsen, Q4 2025)
-```
-
-### Source Line Format
-Bottom of data slides should include:
-```
-Sources: Nielsen Retail Data Q4 2025; Mintel Butter Report Jan 2026
-```
-
-### Recency Requirements
-- Flag any data older than 6 months as potentially stale
-- Prefer Q1 2026 or Q4 2025 data for current decks
-- If using older data, explicitly note: "(2024 data; 2025 update pending)"
+| Situation | Required workflow |
+|---|---|
+| New presentation | Image upload → Build → Dual audit → Fix → Drive |
+| Edits to existing deck | Revise → Dual audit → Fix → Drive |
+| Uploaded deck reconstruction | Reconstruct → Dual audit → Fix → Drive |
+| Export/handoff only | Ensure in canvas → Export → Dual audit → Fix → Drive |
 
 ---
 
 ## Slide Creation Workflow
 
+### Phase 0: Image Upload (MANDATORY FIRST STEP)
+1. Collect all brand images, product photos, competitor logos
+2. Upload ALL to Google Drive or via `manus-upload-file`
+3. Build `image_manifest.json` with public URLs
+4. Never reference local paths in slide HTML when using OpenRouter API
+
 ### Phase 1: Planning
 1. Confirm topic, audience, and purpose
-2. Request or extract brand colors and logo
-3. Outline slide structure (recommend 1 slide per key point)
+2. Extract brand colors, fonts, and logo
+3. Outline slide structure (1 slide per key point)
 4. Identify which slides need charts, images, or diagrams
-5. **Prepare research_context_summary.md** with top facts, available images, and data tables
+5. Prepare `research_context_summary.md`
 
-### Phase 2: Building
-1. Create all slides in Manus native slides canvas
-2. Apply visual standards (fonts, margins, density)
+### Phase 2: Building (Using Manus `slide_edit` Tool)
+1. Create all slides in Manus native canvas using `slide_edit`
+2. Apply visual standards: fonts, margins, density, color
 3. Ensure every slide has required visual elements per type
 4. Add citations to all quantitative claims
-5. Embed brand product images on at least 3 slides
+5. Embed brand product images on ≥ 3 slides
+6. Verify image URLs are public CDN links (not local paths)
 
 ### Phase 3: Export
 1. Export PPTX
 2. Export PDF (v1)
 
 ### Phase 4: Dual Audit + Fix Cycle
-1. **Prepare research_context_summary.md** (if not already done)
-2. Run Opus 4.7 formatting + image enrichment audit (with research context)
-3. Fix all MAJOR_ISSUES and BLANK_BROKEN slides
-4. Execute Opus IMAGE_ENRICHMENT_PLAN (add all suggested charts/images)
-5. Re-export PDF (v2)
-6. Run GPT-5.5-pro fact-check + additional image audit (with research context)
-7. Fix all LIKELY_HALLUCINATED and CONTRADICTED claims
-8. Execute GPT-5.5 ADDITIONAL_IMAGE_LOG (add remaining charts/images)
-9. Re-export final PPTX and PDF
+1. Run Opus 4.7 formatting + image enrichment audit
+2. Fix all MAJOR_ISSUES and BLANK_BROKEN slides
+3. Execute Opus IMAGE_ENRICHMENT_PLAN
+4. Re-export PDF (v2)
+5. Run GPT-5.5-pro fact-check + additional image audit
+6. Fix all LIKELY_HALLUCINATED and CONTRADICTED claims
+7. Execute GPT-5.5 ADDITIONAL_IMAGE_LOG
+8. Re-export final PPTX and PDF
 
 ### Phase 5: Delivery
 1. Save final PPTX and PDF to Google Drive
 2. Share audit summary + image enrichment log with user
-3. Note any unresolved issues or caveats
-
----
-
-## Revision Workflow
-
-When user requests edits to an existing deck:
-1. Apply requested changes in Manus native slides canvas
-2. Re-export PPTX and PDF
-3. Run dual audit system (Opus formatting + GPT-5.5-pro fact-check), both with research context
-4. Complete fix cycles including image enrichment
-5. Save to Google Drive
-
----
-
-## Reconstruction Workflow
-
-When user uploads a PPTX or PDF to recreate:
-1. Analyze uploaded file for structure, content, and styling
-2. Recreate in Manus native slides canvas with improvements
-3. Apply visual standards
-4. Export PPTX and PDF
-5. Run dual audit system with research context
-6. Complete fix cycles including image enrichment
-7. Save to Google Drive
 
 ---
 
 ## Quality Checklist (Pre-Delivery)
 
-Before marking any deck complete, verify:
-
-- [ ] All slides in Manus native canvas
-- [ ] PPTX exported
-- [ ] PDF exported (v1)
-- [ ] `research_context_summary.md` prepared with top facts + available images
-- [ ] Opus 4.7 audit completed (with research context passed)
-- [ ] All BLANK_BROKEN slides rebuilt
-- [ ] All MAJOR_ISSUES slides fixed
-- [ ] Opus IMAGE_ENRICHMENT_PLAN fully executed (all suggested charts/images added)
-- [ ] PDF re-exported (v2)
-- [ ] GPT-5.5-pro audit completed (with full research context passed)
-- [ ] All LIKELY_HALLUCINATED claims removed or corrected
-- [ ] All CONTRADICTED claims resolved across all instances
-- [ ] All missing citations added in (Source, Year) format
-- [ ] GPT-5.5 ADDITIONAL_IMAGE_LOG fully executed
-- [ ] `image_enrichment_log.md` complete with all additions documented
-- [ ] Body text ≥ 16px throughout
+- [ ] All images uploaded to Google Drive / CDN before slide building
+- [ ] `image_manifest.json` created with public URLs
+- [ ] All `<img>` tags use public CDN URLs or verified absolute local paths
+- [ ] No local relative paths in any `<img>` tag
+- [ ] Body text ≥ 16px throughout (zero exceptions)
 - [ ] Titles ≥ 28px throughout
-- [ ] Every slide has ≥ 1 visual element
+- [ ] No slide exceeds word count limits for its type
+- [ ] Margins consistent at 40px on all slides
+- [ ] No large empty white areas (>30% unused space on one side)
+- [ ] No blue dashed borders or card shadows
+- [ ] Brand colors present on every slide
+- [ ] Every slide has ≥ 1 visual element (chart, image, icon, diagram)
 - [ ] ≥ 40% of slides have photographic/illustrative images
 - [ ] Brand product images on ≥ 3 slides
-- [ ] Text density ≤ 60% on all slides
-- [ ] Margins consistent at 40px
-- [ ] Brand colors present on every slide
 - [ ] All quantitative claims have (Source, Year) citations
+- [ ] Opus 4.7 audit completed
+- [ ] All BLANK_BROKEN slides rebuilt
+- [ ] All MAJOR_ISSUES slides fixed
+- [ ] Opus IMAGE_ENRICHMENT_PLAN fully executed
+- [ ] GPT-5.5-pro audit completed
+- [ ] All LIKELY_HALLUCINATED claims removed
+- [ ] All CONTRADICTED claims resolved
+- [ ] GPT-5.5 ADDITIONAL_IMAGE_LOG fully executed
 - [ ] Final PPTX and PDF saved to Google Drive
+
+---
+
+## Citation Standards
+
+Every quantitative claim MUST have a parenthetical citation:
+```
+Premium butter market growing at 10% CAGR (Circana, Q4 2025)
+```
+
+Data slide source line (bottom of slide):
+```
+Sources: Circana Retail Data Q4 2025; Mintel Butter Report Jan 2026
+```
+
+Flag data older than 6 months: `(2024 data; 2025 update pending)`
 
 ---
 
 ## Error Recovery
 
-### If Opus audit fails to run:
-1. Retry with PDF URL via `manus-upload-file`
-2. If still failing, manually review PDF against visual standards checklist
-3. Document that automated audit was unavailable
+### If images are missing after slide build:
+1. Check `image_manifest.json` — are all URLs public CDN links?
+2. Re-upload any local images via `manus-upload-file`
+3. Update all `<img src="">` tags with the new public URLs
+4. **Never accept a slide with a broken or missing image**
 
-### If GPT-5.5-pro audit fails to run:
-1. Retry with `gpt-5.5-xhigh` alias
-2. If that fails, use Gemini 3.1 Pro as emergency fallback
-3. If all fail, manually review all quantitative claims for citations
-4. Flag deck as "Fact-check audit incomplete" in delivery
+### If Opus audit fails:
+1. Retry with PDF URL via `manus-upload-file`
+2. If still failing, manually review against visual standards checklist
+
+### If GPT-5.5-pro audit fails:
+1. Retry with `gpt-5.5-xhigh`
+2. If that fails, use Gemini 3.1 Pro as fallback
+3. Flag deck as "Fact-check audit incomplete" in delivery
 
 ### If fix cycle creates new issues:
 1. Re-run relevant audit after fixes
 2. Iterate until no MAJOR_ISSUES or LIKELY_HALLUCINATED remain
 3. Maximum 3 fix cycles before escalating to user
 
-### If image search returns no suitable results:
-1. Try 2 alternative search queries
-2. Use a brand-appropriate abstract or texture image as fallback
-3. Build a data visualization instead if the slide has data
-4. Never leave a slide with zero visual elements
-
 ---
 
 ## Manus Skill Update Procedure
 
-When updating this skill or any other skill globally, follow this two-step process:
-
 ### Step 1: Update files on disk and push to GitHub
 ```bash
-# 1. Edit the skill file(s)
-# 2. Copy to the cloned manus-skills repo
 cp /home/ubuntu/skills/<skill-name>/SKILL.md /home/ubuntu/manus-skills/skills/<skill-name>/SKILL.md
-# 3. Commit and push
 cd /home/ubuntu/manus-skills && git add -A && git commit -m "Update <skill-name>" && git push
 ```
 
 ### Step 2: Reload in Manus Settings via Browser (MANDATORY)
-After pushing to GitHub, reload the skill in Manus settings:
-1. Navigate to `https://manus.im/app#settings/skills` in the browser
-2. Find the skill in the list (hover to reveal the **"..."** three-dot menu)
-3. Click **"..."** → **"Replace"** to update in place, OR click **"Delete"** then **"+ Add Skill"** → **"Import from GitHub"**
-4. Verify the skill appears with the updated description
+1. Navigate to `https://manus.im/app#settings/skills`
+2. Find the skill (hover to reveal **"..."** three-dot menu)
+3. Click **"..."** → **"Replace"** to update in place
+4. Verify the updated description appears
 
-**If the "..." menu does not appear:** Hover directly over the skill card — the menu appears on hover only.
+**If "..." menu does not appear:** Hover directly over the skill card — the menu appears on hover only.

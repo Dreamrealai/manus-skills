@@ -218,15 +218,20 @@ The `sources.xlsx` file MUST include these columns:
    - Start 5-minute check-in cadence
 2. **Launch Gemini Deep Research** with brand-specific queries
 3. **Launch Claude Deep Research** if fourth stream requested
-4. **Begin Manus independent research**
+4. **Begin Manus independent research** — MUST include:
+   - Winning ads/campaigns research (AdAge, Kantar, WARC, YouTube Ad Leaderboards)
+   - Retailer distribution data (SPINS, IRI/Circana, retailer websites, LinkedIn job postings)
+   - Regional market data (Nielsen regional splits, state-level consumption data)
+   - Channel strategy benchmarks (eMarketer, Pathmatics, Sensor Tower)
 
 #### 1.2 Social Mining (60 minutes MANDATORY)
 Start timer. Mine these platforms:
-- TikTok (search brand name, category, competitors)
-- Instagram (brand hashtags, competitor hashtags)
-- Reddit (relevant subreddits, brand mentions)
-- Twitter/X (brand mentions, category conversations)
-- YouTube (product reviews, category content)
+- TikTok (search brand name, category, competitors, winning creative formats)
+- Instagram (brand hashtags, competitor hashtags, influencer content)
+- Reddit (relevant subreddits, brand mentions, purchase decision discussions)
+- Twitter/X (brand mentions, category conversations, influencer posts)
+- YouTube (product reviews, category content, ad creative examples)
+- Pinterest (recipe content, lifestyle imagery, category inspiration)
 
 Use 5 Gemini 3.1 Pro calls to summarize findings per platform.
 
@@ -337,6 +342,10 @@ brandinsights_[brand-name]_[YYYYMMDD]_[HHMM]ET/
 ### Deck Quality
 - [ ] 20-30 slides generated
 - [ ] Brand colors applied
+- [ ] Winning ads/strategies section included (≥ 1 slide)
+- [ ] Retailer footprint/distribution slide included
+- [ ] Regional dynamics slide included
+- [ ] Channel strategy/marketing mix slide included
 - [ ] Opus 4.7 formatting audit completed
 - [ ] All MAJOR_ISSUES fixed
 - [ ] ChatGPT 5.5 fact-check audit completed
@@ -380,6 +389,37 @@ brandinsights_[brand-name]_[YYYYMMDD]_[HHMM]ET/
 
 ## Prompt Templates
 
+### 13. Winning Ads, Strategies & Channel Intelligence (MANDATORY)
+Every brandinsights deck MUST include research and slides on:
+
+**A. Winning Ads & Creative Strategies**
+- Identify 3-5 highest-performing ad campaigns in the category (by platform: TV, digital, social, OOH)
+- For each: describe the creative concept, messaging hook, format, and why it worked
+- Flag which competitors are running the most effective creative and on which channels
+- Include examples of viral/organic content that drove brand awareness (TikTok, Instagram Reels, YouTube)
+- Note: for new brands, research winning campaigns from analogous categories (e.g., premium food, farm-to-table, artisanal CPG)
+
+**B. Retailer Footprint & Distribution Strategy**
+- Map current and target retailer distribution: Natural/Specialty (Whole Foods, Sprouts), Conventional (Kroger, Safeway, Albertsons), Club (Costco, Sam's Club), Mass (Walmart, Target), Online (Amazon, Instacart, DTC)
+- For each retailer tier: shelf placement norms, buyer priorities, promotional cadence, slotting fee expectations
+- Identify which competitors have the strongest retail presence and in which channels
+- Flag distribution gaps and white-space opportunities
+- Note: distribution strategy directly shapes marketing investment — a Whole Foods-first brand has different media mix than a Walmart-first brand
+
+**C. Regional Dynamics & Personalization**
+- Identify which US regions over-index for the category (e.g., premium butter: Northeast, Pacific Northwest, Mountain West)
+- Map regional flavor preferences, cultural affinities, and consumption occasions that vary by geography
+- Flag regional competitors with strong local presence that national brands must displace
+- Identify regional media and influencer opportunities (local food media, regional grocery chains, state-specific food culture)
+- Recommend regional launch sequencing: which markets to enter first and why
+
+**D. Channel Strategy & Marketing Mix**
+- Recommend primary and secondary marketing channels based on target consumer and retailer footprint
+- For each channel: estimated CPM/CPC benchmarks, format recommendations, content strategy
+- Map the path to purchase: awareness → consideration → trial → loyalty, and which channels own each stage
+- Flag which channels competitors are investing in most heavily
+- Include in-store marketing considerations: end-cap placement, shelf talkers, sampling programs
+
 ### ChatGPT Deep Research Launch Prompt
 ```
 I need comprehensive research on [BRAND NAME] in the [CATEGORY] market.
@@ -393,6 +433,10 @@ Please research:
 6. Recent news, earnings, and market developments
 7. Social media presence and sentiment
 8. Market size and growth trends for the category
+9. Winning ad campaigns and creative strategies in this category (last 24 months)
+10. Retailer distribution footprint for key competitors
+11. Regional market dynamics and geographic variation in consumption
+12. Channel strategy and marketing mix benchmarks for the category
 
 Focus on data from the past 12 months. Cite all sources with URLs.
 ```
