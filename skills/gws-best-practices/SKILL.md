@@ -80,6 +80,42 @@ Always share **both** links with the user:
 
 > **NEVER deliver a Google Drive link to the user without first confirming that `type: "anyone"` permission has been set. A link without public access will always return "Access Denied" for the user.**
 
+## Use Google Drive for Permanent Public Image URLs — NEVER Use manuscdn.com
+
+> **CRITICAL: `files.manuscdn.com` URLs are session-scoped and expire. They will return "Access Denied" when shared with users. NEVER use manuscdn.com URLs in any deliverable, spreadsheet, document, or slide that will be shared with the user.**
+
+Whenever images need to be publicly accessible and shareable (e.g., in spreadsheets, documents, or as reference links), ALWAYS upload them to Google Drive and generate a permanent public URL:
+
+**Step 1 — Upload image to Google Drive:**
+```bash
+# Use rclone from the HOME directory (gws --upload requires running from the file's directory)
+rclone copy /path/to/image.png "manus_google_drive:FolderName/" \
+  --config /home/ubuntu/.gdrive-rclone.ini \
+  --drive-root-folder-id <PARENT_FOLDER_ID> -v
+```
+
+**Step 2 — Get the file ID:**
+```bash
+gws drive files list \
+  --params '{"q": "name = \"image.png\" and trashed=false", "fields": "files(id,name)", "pageSize": 5}'
+```
+
+**Step 3 — Make it public:**
+```bash
+gws drive permissions create \
+  --params '{"fileId": "<FILE_ID>", "fields": "id"}' \
+  --json '{"role": "reader", "type": "anyone"}'
+```
+
+**Step 4 — Use this permanent URL format:**
+```
+https://drive.google.com/uc?export=view&id=<FILE_ID>
+```
+
+This URL is permanent, public, and works for direct image embedding in documents, spreadsheets, and HTML slides.
+
+> **The `files.manuscdn.com` domain is for internal Manus session use only. It is NOT a permanent CDN. Always replace these with Google Drive URLs before delivering any file to the user.**
+
 ## Prohibition of Permanent Deletion
 
 > **CRITICAL: Do NOT execute any gws command that permanently deletes user data — ever.**
