@@ -116,6 +116,33 @@ This URL is permanent, public, and works for direct image embedding in documents
 
 > **The `files.manuscdn.com` domain is for internal Manus session use only. It is NOT a permanent CDN. Always replace these with Google Drive URLs before delivering any file to the user.**
 
+## Excel / Spreadsheet URL Rules — NEVER Embed URLs as Plain Text
+
+> **CRITICAL: Embedding a URL inside a longer string (e.g., `"https://...  [description]"`) makes it unclickable plain text. Users cannot open it. This is the #1 cause of "broken links" complaints.**
+
+When writing URLs into Excel/spreadsheet cells:
+
+1. **Each URL MUST be in its own dedicated cell** — never concatenated with description text in the same cell.
+2. **Always set the Excel hyperlink property** using openpyxl:
+   ```python
+   cell.value = url          # visible text
+   cell.hyperlink = url      # makes it a real clickable link
+   cell.font = Font(color="0563C1", underline="single")  # blue underlined
+   ```
+3. **Descriptions go in a separate adjacent column**, never appended to the URL cell.
+4. **Validate hyperlinks programmatically** before saving:
+   ```python
+   assert cell.hyperlink is not None, f"Missing hyperlink on row {cell.row}"
+   assert cell.hyperlink.target.startswith("https://"), "Invalid hyperlink target"
+   ```
+5. **Test the URL returns HTTP 200** before including it:
+   ```bash
+   curl -s -L -o /dev/null -w "%{http_code}" "https://drive.google.com/uc?export=view&id=<ID>"
+   # Must return 200, not 302, 403, or 404
+   ```
+
+> **Summary: URL in cell value + `cell.hyperlink = url` + separate description column + HTTP 200 validation = the only correct pattern.**
+
 ## Prohibition of Permanent Deletion
 
 > **CRITICAL: Do NOT execute any gws command that permanently deletes user data — ever.**
