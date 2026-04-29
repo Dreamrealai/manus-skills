@@ -56,10 +56,12 @@ Phase 1: Preflight Setup (folders, naming, tracker)
      │
      ▼
 Phase 2: PARALLEL LAUNCH
-     ├── 2a: Gemini Deep Research  ──┐
-     ├── 2b: ChatGPT Deep Research ──┤
-     ├── 2c: Claude Research       ──┤  (all simultaneously)
-     └── 2d: Manus Social Recon    ──┘
+     ├── 2a: Gemini Deep Research (Targeted)  ──┐
+     ├── 2b: ChatGPT Deep Research (Targeted) ──┤
+     ├── 2c: Claude Research                  ──┤  (all simultaneously)
+     ├── 2d: Manus Social Recon               ──┤
+     ├── 2e: Gemini Deep Research (Broad)     ──┤
+     └── 2f: ChatGPT Agent-Mode (Broad)       ──┘
      │
      ▼
 Phase 3: Monitoring Loop (5/10-min check-ins)
@@ -100,12 +102,13 @@ Constraints: <USER_CONSTRAINTS or "none">
 
 Produce a JSON document with:
 1. "sub_prompts": an array of AT LEAST 3 self-contained deep-research prompts
-   covering distinct sub-angles of the topic. Each must be ~150-300 words.
-   **Crucial Formatting Rule:** Lead with the core topic and context, followed
-   by examples of areas to explore, rather than a strict list of questions. Leave
-   room for open-ended interpretation so the research models can follow the data
-   where it leads. Each prompt must request citations.
-   **Mandatory Breadth Rule for Tooling/Software:** If the topic involves tools, platforms, software, or technology, the very first sub-prompt MUST explicitly command the research models to exhaustively enumerate, categorize, and list every relevant tool updated or released through 2026 BEFORE performing deeper analysis.
+   covering distinct sub-angles of the topic. Each must be brief, open-ended, and 
+   no more than 2-3 sentences long.
+   **Crucial Formatting Rule:** Lead with the core topic and context, and instruct
+   the models to discover the latest insights, key trends, players, and best tools.
+   Leave room for expansive interpretation so the research models can follow the data
+   across all sources. Each prompt must request citations and explicitly demand
+   recency anchored to 2026 and maximum breadth.
 2. "meta_question": ONE broad synthesis theme or question that ties all sub-prompts
    together. Must demand cross-domain reasoning and allow for nuanced, unexpected findings.
 3. "strategy_memo": a 300-600 word memo explaining WHY these prompts were
@@ -200,7 +203,7 @@ deepdeep_<slug>_<timestamp>/
 
 > Do not wait for any stream to finish before starting the next. All four streams launch within the same 5-minute window.
 
-### 2a — Gemini Deep Research
+### 2a — Gemini Deep Research (Targeted)
 
 - **Tool:** Manus Chrome Browser Extension → `gemini.google.com` → enable "Deep Research" mode.
 - **Input:** Paste ALL sub-prompts from `planning/sub_prompts.md` as a combined prompt, explicitly asking for:
@@ -210,7 +213,13 @@ deepdeep_<slug>_<timestamp>/
   - Flagged uncertainties
 - **Action:** Click "Start research" and note the start timestamp in `tracker.md`.
 
-### 2b — ChatGPT Deep Research + Tracker
+### 2e — Gemini Deep Research (Broad)
+
+- **Tool:** Manus Chrome Browser Extension → `gemini.google.com` → enable "Deep Research" mode (in a new tab/thread).
+- **Input:** "Provide the latest insights on <USER_TOPIC>. What are the key trends, players, and best tools? Be expansive in all sources, ensure recency anchored to 2026, and capture maximum breadth."
+- **Action:** Click "Start research" and note the start timestamp in `tracker.md`.
+
+### 2b — ChatGPT Deep Research (Targeted) + Tracker
 
 - **Tool:** Manus Chrome Browser Extension → `chatgpt.com` → select "Deep Research" (or equivalent) mode on GPT-5.4 Pro.
 - **Input:** ALL sub-prompts **PLUS the meta-question** (this stream is the only one that gets the meta-question during initial research).
@@ -221,6 +230,12 @@ deepdeep_<slug>_<timestamp>/
 - Answer ChatGPT's clarifying questions quickly and minimally (prefer "proceed with best judgment, cover all angles").
 - **Immediately save the direct conversation URL** once the `/c/<conversation_id>` thread exists. Store it in `tracker.md` under the ChatGPT row. This URL is required for all subsequent check-ins and harvest. If the URL is lost, recover it from the ChatGPT sidebar by finding the most recent matching conversation.
 - Log the start timestamp.
+
+### 2f — ChatGPT Agent-Mode Thinking (Broad)
+
+- **Tool:** Manus Chrome Browser Extension → `chatgpt.com` → select "Agent Mode" (allows browsing, looking at sites directly).
+- **Input:** "Provide the latest insights on <USER_TOPIC>. What are the key trends, players, and best tools? Be expansive in all sources, ensure recency anchored to 2026, and capture maximum breadth."
+- **Action:** Allow Agent Mode to browse sites directly. Save the conversation URL and note the start timestamp in `tracker.md`.
 
 > **Timing note:** ChatGPT Pro Deep Research routinely takes **30–60 minutes** to complete. This is expected behavior, not a failure. The 60-minute mark is a **hard ceiling** — not a typical completion time. Do not treat a long-running session as stalled unless it exceeds 60 minutes without any visible progress. Plan the rest of the workflow accordingly and keep the monitoring loop active throughout.
 
@@ -411,8 +426,10 @@ Do NOT remove unique findings, citations, or any content from a single-source se
 You are the aggregator for an overkill redundant research project. You have:
 - planning/strategy_memo.md
 - planning/meta_question.md
-- raw/gemini_deepresearch_<slug>.md
-- raw/chatgpt_deepresearch_<slug>.md
+- raw/gemini_deepresearch_targeted_<slug>.md
+- raw/gemini_deepresearch_broad_<slug>.md
+- raw/chatgpt_deepresearch_targeted_<slug>.md
+- raw/chatgpt_agent_broad_<slug>.md
 - raw/claude_research_<slug>.md
 - raw/manus_social_<slug>.md (plus per-platform sub-reports)
 

@@ -14,7 +14,7 @@ Optional **fourth stream — Claude.ai Research (Anthropic)** — can be activat
 ## 🚨 Non-Negotiable Rules
 
 ### 1. Launch Parallel Research Early
-Launch Gemini and ChatGPT deep research immediately so they run in parallel with Manus research.
+Launch Gemini and ChatGPT deep research (both targeted and broad versions) immediately so they run in parallel with Manus research.
 
 ### 2. ChatGPT 60-Minute Wait is MANDATORY
 **ChatGPT Pro Deep Research can take up to 60 minutes.** This is normal. The moment ChatGPT Deep Research is initiated:
@@ -160,10 +160,11 @@ Any metric with conflicting values across sources MUST be flagged:
 4. Start reminder sidecar
 
 ### Phase 1: Launch Parallel Research (5-15 minutes)
-1. **Launch Gemini Deep Research** with detailed query
-2. **Launch ChatGPT Deep Research** via browser extension
-3. Save ChatGPT conversation URL immediately
-4. **Begin Manus independent research** using web search and browsing
+1. **Launch Gemini Deep Research (Targeted)** with a brief, open-ended query (2-3 sentences max) that explicitly demands recency anchored to 2026 and requests citations.
+2. **Launch Gemini Deep Research (Broad)** in a new tab with: "Provide the latest insights on <USER_TOPIC>. What are the key trends, players, and best tools? Be expansive in all sources, ensure recency anchored to 2026, and capture maximum breadth."
+3. **Launch ChatGPT Deep Research (Targeted)** via browser extension with the same brief, open-ended query as Gemini Targeted. Save conversation URL immediately.
+4. **Launch ChatGPT Agent-Mode Thinking (Broad)** via browser extension (Agent Mode) with the same broad prompt as Gemini Broad. Save conversation URL immediately.
+5. **Begin Manus independent research** using web search and browsing.
 
 ### Phase 2: Active Research (15-60 minutes)
 1. Continue Manus research while waiting
@@ -193,8 +194,10 @@ Any metric with conflicting values across sources MUST be flagged:
 
 | File Type | Naming Example |
 |-----------|----------------|
-| Gemini raw research | `butter_gemini-raw_20260427_1430ET.md` |
-| ChatGPT raw research | `butter_chatgpt-raw_20260427_1530ET.md` |
+| Gemini targeted raw | `butter_gemini-targeted_20260427_1430ET.md` |
+| Gemini broad raw | `butter_gemini-broad_20260427_1430ET.md` |
+| ChatGPT targeted raw | `butter_chatgpt-targeted_20260427_1530ET.md` |
+| ChatGPT broad raw | `butter_chatgpt-broad_20260427_1530ET.md` |
 | Manus raw research | `butter_manus-raw_20260427_1400ET.md` |
 | Final synthesis | `butter_synthesis_20260427_1600ET.md` |
 | Consistency check | `butter_consistency-check_20260427_1545ET.md` |
@@ -228,7 +231,7 @@ Every deep research output MUST include:
 # [Topic] Deep Research Report
 
 **Generated:** [Date, Time ET]
-**Sources:** Gemini Deep Research, ChatGPT Deep Research, Manus Web Research
+**Sources:** Gemini Deep Research (Targeted & Broad), ChatGPT Deep Research (Targeted), ChatGPT Agent-Mode (Broad), Manus Web Research
 
 ## Executive Summary
 [Key findings with citations]
@@ -241,11 +244,11 @@ Every deep research output MUST include:
 
 ## Raw Research
 
-### Gemini Deep Research Raw Output
-[Unedited Gemini output with source URLs]
+### Gemini Deep Research Raw Output (Targeted & Broad)
+[Unedited Gemini outputs with source URLs]
 
-### ChatGPT Deep Research Raw Output
-[Unedited ChatGPT output with source URLs]
+### ChatGPT Deep Research & Agent-Mode Raw Output
+[Unedited ChatGPT outputs with source URLs]
 
 ### Manus Research Raw Output
 [Unedited web research with source URLs]
