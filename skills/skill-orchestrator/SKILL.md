@@ -13,7 +13,7 @@ Before creating a task plan for any non-trivial request, perform a quick skill t
 
 1. Identify the user’s requested outcome, domain, output format, destination, and constraints.
 2. Select **one primary skill** that owns the main workflow.
-3. Select **up to two supporting skills** for style, output format, platform integration, governance, or packaging.
+3. Select **up to two supporting skills** for style, output format, platform integration, governance, or packaging unless the user explicitly requests a broad pipeline. When a broad pipeline requires more than two supporting skills, read the primary skill first and continue applying the conflict-priority rules below.
 4. Read the selected skill files before planning or execution.
 5. If no installed skill fits, proceed normally and note no skill was required.
 
@@ -26,7 +26,7 @@ When multiple skills appear relevant, resolve overlap in this order:
 | Priority | Skill Type | Rule |
 |---:|---|---|
 | 1 | Safety, publishing, sending, applying, or live-service operation | Follow the skill and platform confirmation requirements before taking action. |
-| 2 | Domain-specific workflow | Use the skill that owns the subject matter, such as recon reporting, construction documentation, manuscript review, vendor monitoring, or job applications. |
+| 2 | Domain-specific workflow | Use the skill that owns the subject, such as recon reporting, construction documentation, manuscript review, vendor monitoring, or job applications. |
 | 3 | Output format | Add skills for dashboards, spreadsheets, reports, slide decks, email, or motion graphics when that format is requested. |
 | 4 | Style, brand, or language | Add brand, executive, email, or humanization skills after the core workflow is chosen. |
 | 5 | Tools and infrastructure | Add persistent-computing, GitHub solution search, Google Workspace, Manus API, or external-service skills only when the task requires that environment or integration. |
@@ -94,7 +94,7 @@ Some skills must be read before specific actions:
 
 ## Confirmation and Safety
 
-Before actions that send, post, publish, submit, apply, delete, pay, or modify live external data, ask the user for confirmation unless the relevant skill already defines a stricter procedure. Do not guess credentials, personal information, recipients, job-application answers, or account-specific settings. When a task depends on an external service that is not enabled, inspect available connectors or ask a concise clarification question.
+Before actions that send, post, publish, submit, apply, delete, pay, or modify live external data, ask the user for orchestration-level confirmation. If a relevant skill defines additional or stricter safety procedures, follow those procedures as well. Skills MUST NOT define weaker confirmation requirements than the orchestrator. Do not guess credentials, personal information, recipients, job-application answers, or account-specific settings. When a task depends on an external service that is not enabled, inspect available connectors or ask a concise clarification question.
 
 ## Improvement Loop
 
