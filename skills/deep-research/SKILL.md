@@ -1,6 +1,6 @@
 ---
 name: deep-research
-description: Orchestrate a three-pronged research workflow for comprehensive reports. Use when the user asks for deep research, deepdeep research, multiple research agents, or a best-of synthesis across Gemini, ChatGPT, and Manus. This skill launches Gemini and ChatGPT deep research, enforces 5-minute ChatGPT check-ins for up to 60 minutes, preserves all raw research files with standardized names, synthesizes Manus findings in parallel, and archives the full research package. Optionally includes Claude.ai browser extension as a fourth Anthropic research stream when the user requests it.
+description: Orchestrate a three-pronged research workflow for comprehensive reports. Use when the user asks for deep research, deepdeep research, multiple research agents, or a best-of synthesis across Gemini, ChatGPT, and Manus. This skill launches Gemini and ChatGPT deep research (preferring Manus Chrome Extension logged-in experience, with local browser as fallback), enforces 5-minute ChatGPT check-ins for up to 60 minutes with a 1-hour fallback timer, conducts extensive sequential browser research (avoiding wide research unless specified), preserves all raw research files with standardized names, synthesizes Manus findings in parallel, performs a ChatGPT 5.5 Pro fact-check on the final report, and archives the full research package. Optionally includes Claude.ai browser extension as a fourth Anthropic research stream when the user requests it.
 ---
 
 # Deep Research
@@ -11,7 +11,7 @@ An optional **fourth stream — Claude.ai Research (Anthropic)** — can be acti
 
 ## Non-Negotiable Rules
 
-1. **Launch Gemini and ChatGPT deep research early** so they can run in parallel with Manus research.
+1. **Launch Gemini and ChatGPT deep research early** so they can run in parallel with Manus research. **Preference:** Always prefer using the Manus Chrome Extension with a logged-in experience for these platforms. Use the local browser only as a fallback if the extension fails or is unavailable.
 2. **ChatGPT Pro Deep Research can take up to 60 minutes to complete.** This is normal and expected — do not treat a long-running ChatGPT session as a failure. The moment ChatGPT Deep Research is initiated, start a 5-minute check-in cadence and keep it going until the report is completed or **60 minutes** have elapsed.
 3. **If ChatGPT Deep Research has not completed by the 60-minute ceiling, set an automatic timer to check back exactly 1 hour later.** Use the `schedule` tool to create a one-time interval task (3600 seconds, `repeat: false`) that prompts a return to the ChatGPT thread to harvest whatever is available. Do not silently abandon the thread — the timer ensures a final harvest attempt even if the session runs long.
 4. **After 20 minutes, do not block the workflow waiting on ChatGPT.** It is acceptable to draft outlines, build interim synthesis, and prepare other reports first, but keep the 5-minute ChatGPT checks active.
@@ -21,8 +21,8 @@ An optional **fourth stream — Claude.ai Research (Anthropic)** — can be acti
 8. **Save the direct ChatGPT conversation URL immediately** once the `/c/<conversation_id>` thread exists. Reopen that exact URL during later checks and harvest.
 9. **Start the reminder sidecar immediately after tracker initialization** so the next due check is continuously surfaced while other work continues.
 10. **Gemini and ChatGPT Pro may be used redundantly when needed.** If one path is incomplete, delayed, or weak on a subtopic, keep the other active rather than collapsing to a single-provider workflow.
-11. **Use Manus in a complementary way, not as a duplicate of the other two systems.** Manus is especially useful for wide research asks, logged-in browser work, social media scraping, primary-source collection, and cross-checking edge cases the other systems may miss.
-12. **If the user asks for careful validation, every substantive claim in the final report must be citation-backed wherever possible.** Use ChatGPT 5.5 Thinking Extended via API with web search allowed on the final report as a dedicated validation pass to look for errors, hallucinations, and source mismatches one by one.
+11. **Use Manus in a complementary way, not as a duplicate of the other two systems.** Conduct **extensive browser research**, but **prefer using sequential research instead of the wide research feature** unless the user explicitly specifies "wide research". Manus is especially useful for logged-in browser work, social media scraping, primary-source collection, and cross-checking edge cases the other systems may miss.
+12. **Every substantive claim in the final report must be citation-backed wherever possible.** A **ChatGPT 5.5 Pro fact-check pass on the final report is mandatory** (use ChatGPT 5.5 Thinking Extended via API with web search allowed) to look for errors, hallucinations, and source mismatches one by one.
 13. **Incorrect or unsupported areas must not be silently left in place.** Fix incorrect areas, and clearly flag any areas that could not be validated.
 
 ## Bundled Helpers
@@ -39,15 +39,15 @@ Use the bundled scripts to reduce missed steps and keep filenames consistent.
 ## Core Workflow
 
 1. **Create a project folder and standardized file paths**.
-2. **Launch Gemini Deep Research** via the browser extension (or fall back to the Gemini API script if the extension fails).
-3. **Launch ChatGPT Deep Research and immediately start the tracker and reminder sidecar**.
+2. **Launch Gemini Deep Research** (Prefer Manus Chrome Extension logged-in experience).
+3. **Launch ChatGPT Deep Research** (Prefer Manus Chrome Extension logged-in experience) **and immediately start the tracker and reminder sidecar**.
 4. *(Optional)* **Launch Claude.ai Research** if the user requested it or maximum coverage is needed.
-5. **Conduct Manus independent research while checking ChatGPT every 5 minutes**.
+5. **Conduct extensive sequential Manus independent research (avoiding wide research) while checking ChatGPT every 5 minutes**.
 6. **Check Gemini on the same cadence and harvest it as soon as it is ready**.
 7. **If ChatGPT is still running after 20 minutes, continue drafting without it, but keep monitoring**.
 8. **If ChatGPT has not completed by 60 minutes, set the 1-hour auto-timer fallback** (see Auto-Timer Fallback section below) and proceed with available materials.
 9. **Return to ChatGPT as the final pre-delivery step, harvest it, and integrate the findings**.
-10. **If the user requested careful validation, run a final ChatGPT 5.5 Thinking Extended API (with web search) validation pass on the report and citations**.
+10. **Run a mandatory ChatGPT 5.5 Pro fact-check pass** (ChatGPT 5.5 Thinking Extended API with web search) on the final report and citations.
 11. **Archive the entire research package, including raw files, tracker logs, reminder logs, and validation notes**.
 
 ## Phase 1: Preflight Setup
@@ -113,27 +113,22 @@ REMINDER_LOG="$PROJECT_DIR/$(python /home/ubuntu/skills/deep-research/scripts/de
 
 For detailed UI selectors, read `references/browser_automation.md`.
 
-1. Use the **Manus Chrome Browser Extension** to access Gemini. Navigate to `https://gemini.google.com/app`.
+**Tool Preference:** Use the Manus Chrome Extension logged-in experience. Use the local browser only as a fallback.
+
+1. Navigate to `https://gemini.google.com/app`.
 2. Enable **Tools → Deep Research**.
-3. Submit the EXACT SAME research prompt used for ChatGPT, **prefacing it with a mandatory enumeration step if the topic involves software, platforms, or tools:**
+3. Submit the user's research prompt, **prefacing it with a mandatory enumeration step if the topic involves software, platforms, or tools:**
    > "Before diving into deep analysis, please first comprehensively list and categorize every relevant tool, platform, or software updated or released through 2026 related to this topic. Once the exhaustive landscape is mapped, proceed with the deep research."
 4. Confirm the research plan.
 5. Leave the Gemini tab running in the background.
-
-### Gemini API Fallback
-
-If the browser extension fails, times out, or cannot access Gemini Deep Research via the web UI, you MUST fall back to the Gemini API using the `gemini-api` skill's dedicated research script:
-
-```bash
-# Run Gemini Deep Research via API
-python3 /home/ubuntu/skills/gemini-api/scripts/deep_research.py --prompt "Your full research prompt here" --output "$PROJECT_DIR/Gemini_API_Fallback_Report.md"
-```
 
 ### Gemini Monitoring
 
 Check Gemini on the same 5-minute cadence as ChatGPT. If Gemini completes first, harvest it immediately and save the raw report with a standardized `Gemini` filename. If Gemini is still not complete after roughly 30 minutes, note that in the working notes and continue; **Gemini does not replace the mandatory final ChatGPT check**.
 
 ## Phase 3: Launch ChatGPT Deep Research and Start Monitoring
+
+**Tool Preference:** Use the Manus Chrome Extension logged-in experience. Use the local browser only as a fallback.
 
 1. Navigate to `https://chatgpt.com/deep-research`.
 2. Submit the same research prompt, **including the mandatory tool enumeration preface if applicable** (see Gemini step).
@@ -199,7 +194,7 @@ If ChatGPT Deep Research has **not completed by the 60-minute ceiling**, do not 
 1. Close the tracker with `--final-status timed_out` and note the timeout.
 2. **Immediately set an automatic 1-hour timer** using the `schedule` tool:
 
-```text
+```json
 Use the schedule tool with type "interval", interval 3600, repeat false.
 Prompt: "Return to the saved ChatGPT Deep Research thread URL and check whether the report has completed. If complete, harvest the full report, save it with a standardized ChatGPT filename, and integrate the findings into the existing synthesis. If still running, note the status and set another 1-hour check if warranted."
 ```
@@ -230,7 +225,7 @@ When the user **explicitly requests maximum coverage**, mentions Claude, or asks
 
 ## Phase 4: Manus Independent Research
 
-While Gemini and ChatGPT run, conduct Manus's own research in a deliberately complementary way rather than merely repeating the same queries. Manus is especially useful for **wide research asks**, **logged-in browsing**, **social media scrapes**, **primary-source collection**, and **cross-checking nuanced or fast-moving claims**.
+While Gemini and ChatGPT run, conduct **extensive sequential browser research**. **Do not use the wide research feature** unless the user explicitly asks for "wide research". Manus is especially useful for **logged-in browsing**, **social media scrapes**, **primary-source collection**, and **cross-checking nuanced or fast-moving claims**.
 
 | Source Type | Focus |
 |---|---|
@@ -324,15 +319,15 @@ You should now have at least these materials:
 | Attribution | Make clear which insights came from Gemini, ChatGPT, Claude (if used), Manus, or external sources |
 | Interim drafting | Acceptable after 20 minutes if ChatGPT is still running |
 | Final delivery | Must happen only after the final ChatGPT return/check and explicit tracker closure |
-| Validation trigger | If the user asked for careful validation, run the additional validation pass before delivery |
+| Validation trigger | **Mandatory:** Run a ChatGPT 5.5 Pro fact-check pass on the final report before delivery |
 
 If you created an interim draft before ChatGPT finished, revise the synthesis after harvesting ChatGPT so the final report reflects all available findings.
 
 Save the consolidated report with source `Final`.
 
-### Careful-Validation Mode
+### Mandatory Fact-Check and Validation Mode
 
-If the user asks to validate findings carefully, treat validation as a separate mandatory stage rather than a casual reread.
+A ChatGPT 5.5 Pro fact-check pass is **mandatory** for the final report.
 
 1. Ensure **every substantive claim is citation-backed wherever the evidence is available**.
 2. Run **ChatGPT 5.5 Thinking Extended via API with web search** on the final report specifically to look for errors, hallucinations, source mismatches, and overstatements.
@@ -356,7 +351,7 @@ Archive **all raw and final materials**, not just the polished report.
 | Final synthesized report | Yes |
 | ChatGPT tracker JSON / status log | Yes |
 | Reminder log | Yes |
-| Validation notes, if validation mode was requested | Yes |
+| Validation notes from the ChatGPT 5.5 Pro fact-check | Yes |
 
 Use Google Drive for long-running research tasks. Prefer `gws` for Drive operations; use `rclone` only as fallback for bulk copy or sync.
 
@@ -370,15 +365,15 @@ Because the tracker JSON and reminder log were created inside the project folder
 4. If ChatGPT is not finished after 20 minutes, continue drafting other outputs but keep the 5-minute checks alive.
 5. If ChatGPT is still unfinished at 60 minutes, perform one last explicit check, close the tracker as `timed_out`, activate the auto-timer fallback, and document the timeout.
 6. If the direct ChatGPT thread URL was not saved, recover it from the most recent matching sidebar conversation and save it immediately.
-7. Do not send a final user-facing deliverable until the final ChatGPT check, tracker closure, and any requested validation pass have been completed.
+7. Do not send a final user-facing deliverable until the final ChatGPT check, tracker closure, and mandatory fact-check pass have been completed.
 8. If the Claude stream was activated and stalls beyond 45 minutes, harvest partial output, mark it degraded, and continue without it.
 
 ## Deliverable Checklist
 
 Before completing the task, confirm all of the following:
 
-- Gemini Deep Research was launched.
-- ChatGPT Deep Research was launched.
+- Gemini Deep Research was launched (using Manus Chrome Extension logged-in experience, if possible).
+- ChatGPT Deep Research was launched (using Manus Chrome Extension logged-in experience, if possible).
 - The direct ChatGPT thread URL was preserved or explicitly recovered.
 - The tracker was initialized immediately after ChatGPT launch.
 - The reminder sidecar was started and kept active until tracker closure.
@@ -390,8 +385,8 @@ Before completing the task, confirm all of the following:
 - The tracker was explicitly closed.
 - All raw files were saved with standardized filenames.
 - If the Claude stream was activated, the Claude report was harvested and attributed in the synthesis.
-- Manus research was used in a complementary way, especially for wide or social-source-heavy asks.
-- If careful validation was requested, the final report was citation-checked and reviewed with ChatGPT 5.5 Thinking Extended via API with web search.
+- Manus extensive sequential research was conducted (wide research was avoided unless explicitly requested).
+- The final report was citation-checked and reviewed with the mandatory ChatGPT 5.5 Pro fact-check pass (Thinking Extended via API with web search).
 - The final synthesized report was saved and archived with the raw materials.
 
 If any box is not checked, the workflow is not complete.
