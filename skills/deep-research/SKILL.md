@@ -25,6 +25,66 @@ An optional **fourth stream — Claude.ai Research (Anthropic)** — can be acti
 12. **Every substantive claim in the final report must be citation-backed wherever possible.** A **ChatGPT 5.5 Pro fact-check pass on the final report is mandatory** (use ChatGPT 5.5 Thinking Extended via API with web search allowed) to look for errors, hallucinations, and source mismatches one by one.
 13. **Incorrect or unsupported areas must not be silently left in place.** Fix incorrect areas, and clearly flag any areas that could not be validated.
 
+## Model Routing — NON-NEGOTIABLE
+
+All LLM API calls made during this workflow MUST go through the correct skill. **Never call any LLM API directly (no raw `google-genai`, `openai`, or `requests` calls to LLM endpoints).** Always invoke the skill's script or helper.
+
+### Required Skills
+
+| Task | Required Skill | Required Model |
+|---|---|---|
+| Synthesis, analysis, or reasoning calls | `gemini-api` skill | `gemini-3.1-pro-preview` |
+| Synthesis, analysis, or reasoning calls (alternative) | `openrouter` skill | `gpt-5.5` (alias: `chatgpt-5.5`) or `opus-4.7` |
+| Fact-check / validation pass | `openrouter` skill | `gpt-5.5` with `--reasoning high` |
+| Any model the user explicitly names | That exact model via the appropriate skill | As specified |
+
+### Model Defaults (when user does not specify)
+
+| Role | Default Model | Skill to Use |
+|---|---|---|
+| Primary synthesis | Gemini 3.1 Pro Preview | `gemini-api` skill → `gemini-3.1-pro-preview` alias |
+| Secondary synthesis / cross-check | GPT-5.5 | `openrouter` skill → `gpt-5.5` alias |
+| Deep reasoning / validation | Opus 4.7 | `openrouter` skill → `opus-4.7` alias |
+
+### Forbidden Patterns
+
+The following are **strictly forbidden** and will cause the workflow to be considered incomplete:
+
+- Calling `google.genai` or `google-generativeai` directly without reading the `gemini-api` skill first.
+- Using `gemini-2.5-flash`, `gemini-2.0`, `gpt-4`, `gpt-4o`, or any model not listed in the defaults above unless the user explicitly requested it.
+- Skipping the `gemini-api` or `openrouter` skill and writing raw API scripts.
+- Using any model shorthand (e.g., `gemini-2.5`) that does not match the user's profile defaults or explicit request.
+
+### How to Invoke the Skills
+
+**Gemini 3.1 Pro (synthesis):**
+```bash
+# Read the skill first, then use its catalog alias
+# /home/ubuntu/skills/gemini-api/SKILL.md → gemini-3.1-pro-preview alias
+python3 /home/ubuntu/skills/gemini-api/scripts/gemini_chat.py \
+  --alias gemini-3.1-pro-preview \
+  --prompt "<your synthesis prompt>"
+```
+
+**GPT-5.5 via OpenRouter (fact-check / validation):**
+```bash
+# Read the skill first, then use the alias
+# /home/ubuntu/skills/openrouter/SKILL.md → gpt-5.5 alias
+python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
+  --alias gpt-5.5 \
+  --reasoning high \
+  --prompt "<your validation prompt>"
+```
+
+**Opus 4.7 via OpenRouter (deep reasoning):**
+```bash
+python3 /home/ubuntu/skills/openrouter/scripts/openrouter_chat.py \
+  --alias opus-4.7 \
+  --prompt "<your reasoning prompt>"
+```
+
+> **ALWAYS read the `gemini-api/SKILL.md` or `openrouter/SKILL.md` before making any API call** to confirm the current alias names and script paths. Aliases may be updated; never hardcode model strings.
+
 ## Bundled Helpers
 
 Use the bundled scripts to reduce missed steps and keep filenames consistent.
@@ -302,6 +362,8 @@ If the report never completes by the 60-minute final check, close with `--final-
 
 ## Phase 6: Synthesis
 
+> **Model routing reminder:** All synthesis LLM calls MUST use the `gemini-api` skill (`gemini-3.1-pro-preview`) or the `openrouter` skill (`gpt-5.5` / `opus-4.7`). Read those skills before writing any synthesis code. Never call any LLM API directly.
+
 You should now have at least these materials:
 
 1. A raw Gemini report.
@@ -327,10 +389,10 @@ Save the consolidated report with source `Final`.
 
 ### Mandatory Fact-Check and Validation Mode
 
-A ChatGPT 5.5 Pro fact-check pass is **mandatory** for the final report.
+A GPT-5.5 fact-check pass is **mandatory** for the final report. **Use the `openrouter` skill — read `openrouter/SKILL.md` first, then call `gpt-5.5` with `--reasoning high`.** Do NOT call the OpenAI API directly.
 
 1. Ensure **every substantive claim is citation-backed wherever the evidence is available**.
-2. Run **ChatGPT 5.5 Thinking Extended via API with web search** on the final report specifically to look for errors, hallucinations, source mismatches, and overstatements.
+2. Run **GPT-5.5 via the `openrouter` skill** (`--alias gpt-5.5 --reasoning high`) on the final report specifically to look for errors, hallucinations, source mismatches, and overstatements.
 3. Check cited sources one by one rather than trusting summary-level agreement.
 4. Fix incorrect areas before delivery.
 5. If a claim cannot be validated cleanly, flag it clearly to the user instead of presenting it as established fact.
@@ -388,6 +450,8 @@ Before completing the task, confirm all of the following:
 - Manus extensive sequential research was conducted (wide research was avoided unless explicitly requested).
 - The final report was citation-checked and reviewed with the mandatory ChatGPT 5.5 Pro fact-check pass (Thinking Extended via API with web search).
 - The final synthesized report was saved and archived with the raw materials.
+- All LLM API calls used the `gemini-api` skill (`gemini-3.1-pro-preview`) or `openrouter` skill (`gpt-5.5` / `opus-4.7`) — no raw API calls were made directly.
+- No forbidden model strings (`gemini-2.5-flash`, `gemini-2.0`, `gpt-4o`, etc.) were used unless explicitly requested by the user.
 
 If any box is not checked, the workflow is not complete.
 
